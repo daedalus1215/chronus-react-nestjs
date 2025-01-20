@@ -3,26 +3,21 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { useAuth } from "react-oidc-context";
+import { getCognitoLogoutUrl } from "./auth/getCognitoLogoutUrl";
 
 function App() {
   const [count, setCount] = useState(0);
   const auth = useAuth();
 
   const signOutRedirect = () => {
-    const clientId = "4e96isplgtbr3ecp2o4lfm6d32";
-    const logoutUri = "http://localhost:5173";
-    const cognitoDomain =
-      "https://us-east-1lmsskkkce.auth.us-east-1.amazoncognito.com";
-    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(
-      logoutUri
-    )}`;
+    window.location.href = getCognitoLogoutUrl()
   };
 
   if (auth.isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (auth.error) {
+if (auth.error) {
     return <div>Encountering error... {auth.error.message}</div>;
   }
 
