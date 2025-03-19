@@ -2,26 +2,14 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { useAuth } from "react-oidc-context";
-import { getCognitoLogoutUrl } from "./auth/getCognitoLogoutUrl";
+import { useAuth } from "./auth/AuthContext";
+import { Login } from "./components/Login";
 
 function App() {
   const [count, setCount] = useState(0);
-  const auth = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
-  const signOutRedirect = () => {
-    window.location.href = getCognitoLogoutUrl()
-  };
-
-  if (auth.isLoading) {
-    return <div>Loading...</div>;
-  }
-
-if (auth.error) {
-    return <div>Encountering error... {auth.error.message}</div>;
-  }
-
-  if (auth.isAuthenticated) {
+  if (isAuthenticated) {
     return (
       <>
         <div>
@@ -45,23 +33,13 @@ if (auth.error) {
           Click on the Vite and React logos to learn more
         </p>
         <div>
-        <pre> Hello: {auth.user?.profile.email} </pre>
-        <pre> ID Token: {auth.user?.id_token} </pre>
-        <pre> Access Token: {auth.user?.access_token} </pre>
-        <pre> Refresh Token: {auth.user?.refresh_token} </pre>
-
-        <button onClick={() => auth.removeUser()}>Sign out</button>
-      </div>
+          <button onClick={logout}>Sign out</button>
+        </div>
       </>
     );
   }
 
-  return (
-    <div>
-      <button onClick={() => auth.signinRedirect()}>Sign in</button>
-      <button onClick={() => signOutRedirect()}>Sign out</button>
-    </div>
-  );
+  return <Login />;
 }
 
 export default App;
