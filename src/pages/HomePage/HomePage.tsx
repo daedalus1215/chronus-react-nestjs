@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NoteList } from '../../components/NoteList';
 import { useAuth } from '../../auth/useAuth';
+import { NoteListView } from './components/NoteListView';
 
 export const HomePage: React.FC = () => {
   const { logout, user } = useAuth();
@@ -28,7 +28,7 @@ export const HomePage: React.FC = () => {
         </button>
       </header>
       <main>
-        <NoteList userId={user.id} />
+        <NoteListView userId={user.id} />
       </main>
     </div>
   );
