@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback } from 'react';
+import { createContext, useContext, useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface AuthContextType {
@@ -10,8 +10,9 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuthProvider = () => {
-  const getStoredToken = () => localStorage.getItem('jwt_token');
-  const isAuthenticated = !!getStoredToken();
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return !!localStorage.getItem('jwt_token');
+  });
 
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
     try {
@@ -22,6 +23,7 @@ export const useAuthProvider = () => {
 
       const { access_token } = response.data;
       localStorage.setItem('jwt_token', access_token);
+      setIsAuthenticated(true);
       return true;
     } catch (error) {
       console.error('Login failed:', error);
@@ -31,6 +33,19 @@ export const useAuthProvider = () => {
 
   const logout = useCallback(() => {
     localStorage.removeItem('jwt_token');
+    setIsAuthenticated(false);
+  }, []);
+
+  // Update authentication status if token changes in another tab/window
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem('jwt_token'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   return {
