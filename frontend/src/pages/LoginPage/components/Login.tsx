@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import styles from './Login.module.css';
 
 interface LoginProps {
   onLogin: (username: string, password: string) => Promise<boolean>;
@@ -25,11 +26,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit}>
+    <div className={styles.loginContainer}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <h2>Login</h2>
-        {error && <div className="error">{error}</div>}
-        <div className="form-group">
+        {error && <div className={styles.error}>{error}</div>}
+        <div className={styles.formGroup}>
           <label htmlFor="username">Username</label>
           <input
             type="text"
@@ -39,7 +40,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             required
           />
         </div>
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -49,9 +50,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" className={styles.submitButton}>Login</button>
       </form>
-      <div className="register-link">
+      <div className={styles.registerLink}>
         Don't have an account? <Link to="/register">Register here</Link>
       </div>
     </div>

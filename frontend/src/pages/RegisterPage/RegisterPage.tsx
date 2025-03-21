@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Register } from './components/Register';
 import { useAuth } from '../../auth/useAuth';
+import styles from './RegisterPage.module.css';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,8 +33,8 @@ export const RegisterPage: React.FC = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="register-page">
-      <h1>Create an Account</h1>
+    <div className={styles.registerPage}>
+      <h1 className={styles.title}>Create an Account</h1>
       <Register onRegister={handleRegister} />
     </div>
   );

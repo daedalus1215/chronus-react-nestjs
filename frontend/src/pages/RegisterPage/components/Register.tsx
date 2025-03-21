@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import styles from './Register.module.css';
 
 interface RegisterProps {
   onRegister: (username: string, password: string) => Promise<boolean>;
@@ -31,11 +32,11 @@ export const Register: React.FC<RegisterProps> = ({ onRegister }) => {
   };
 
   return (
-    <div className="register-container">
-      <form onSubmit={handleSubmit}>
+    <div className={styles.registerContainer}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <h2>Register</h2>
-        {error && <div className="error">{error}</div>}
-        <div className="form-group">
+        {error && <div className={styles.error}>{error}</div>}
+        <div className={styles.formGroup}>
           <label htmlFor="username">Username</label>
           <input
             type="text"
@@ -45,7 +46,7 @@ export const Register: React.FC<RegisterProps> = ({ onRegister }) => {
             required
           />
         </div>
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -55,7 +56,7 @@ export const Register: React.FC<RegisterProps> = ({ onRegister }) => {
             required
           />
         </div>
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input
             type="password"
@@ -65,9 +66,9 @@ export const Register: React.FC<RegisterProps> = ({ onRegister }) => {
             required
           />
         </div>
-        <button type="submit">Register</button>
+        <button type="submit" className={styles.submitButton}>Register</button>
       </form>
-      <div className="login-link">
+      <div className={styles.loginLink}>
         Already have an account? <Link to="/login">Login here</Link>
       </div>
     </div>
