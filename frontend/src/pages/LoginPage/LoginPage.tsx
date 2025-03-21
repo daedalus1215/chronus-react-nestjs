@@ -29,7 +29,7 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className={styles.loginPage}>
-      <h1 className={styles.title}>Welcome to Chronus</h1>
+      <h1 className={styles.title}>Chronus</h1>
       <Login onLogin={handleLogin} />
     </div>
   );
