@@ -1,33 +1,39 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-interface LoginProps {
-  onLogin: (username: string, password: string) => Promise<boolean>;
+interface RegisterProps {
+  onRegister: (username: string, password: string) => Promise<boolean>;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLogin }) => {
+export const Register: React.FC<RegisterProps> = ({ onRegister }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     try {
-      const success = await onLogin(username, password);
+      const success = await onRegister(username, password);
       if (!success) {
-        setError('Invalid credentials');
+        setError('Registration failed. Username might be taken.');
       }
     } catch {
-      setError('An error occurred during login');
+      setError('An error occurred during registration');
     }
   };
 
   return (
-    <div className="login-container">
+    <div className="register-container">
       <form onSubmit={handleSubmit}>
-        <h2>Login</h2>
+        <h2>Register</h2>
         {error && <div className="error">{error}</div>}
         <div className="form-group">
           <label htmlFor="username">Username</label>
@@ -49,10 +55,20 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Register</button>
       </form>
-      <div className="register-link">
-        Don't have an account? <Link to="/register">Register here</Link>
+      <div className="login-link">
+        Already have an account? <Link to="/login">Login here</Link>
       </div>
     </div>
   );
