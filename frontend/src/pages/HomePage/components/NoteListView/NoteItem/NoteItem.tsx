@@ -1,18 +1,18 @@
 import React from 'react';
 import styles from './NoteItem.module.css';
 
-interface Note {
+type Note = {
   name: string;
   userId: string;
   isMemo: boolean;
   createdAt?: string;
 }
 
-interface NoteItemProps {
+type NoteItemProps = {
   note: Note;
 }
 
-export function NoteItem({ note }: NoteItemProps) {
+export const NoteItem:React.FC<NoteItemProps> = ({ note }) => {
   const timeAgo = note.createdAt ? '39m' : ''; // This should be calculated from note.createdAt
 
   return (
