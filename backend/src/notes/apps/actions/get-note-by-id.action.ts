@@ -10,7 +10,7 @@ export class GetNoteByIdAction {
     private readonly getNoteByIdTransactionScript: GetNoteByIdTransactionScript
   ) {}
 
-  @Get(':id')
+  @Get('detail/:id')
   @ApiOperation({ summary: 'Get a note by ID' })
   @ApiResponse({ status: 200, description: 'Returns the note.', type: NoteResponseDto })
   @ApiResponse({ status: 404, description: 'Note not found.' })

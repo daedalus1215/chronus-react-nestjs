@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNotes } from '../../../../hooks/useNotes';
+import { useNotes } from '../../hooks/useNotes';
 import { NoteItem } from './NoteItem/NoteItem';
 import styles from './NoteListView.module.css';
 

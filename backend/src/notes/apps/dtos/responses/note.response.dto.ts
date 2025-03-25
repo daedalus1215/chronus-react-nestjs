@@ -27,10 +27,10 @@ export class NoteResponseDto {
   constructor(note: Note) {
     this.id = note.id;
     this.name = note.name;
-    this.content = note.content;
+    this.content = note.memo?.description || '';
     this.userId = note.userId;
-    this.createdAt = note.createdAt;
-    this.updatedAt = note.updatedAt;
+    this.createdAt = new Date(note.createdAt);
+    this.updatedAt = new Date(note.updatedAt);
     this.tags = note.tags;
   }
 } 
