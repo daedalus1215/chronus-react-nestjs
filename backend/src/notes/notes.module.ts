@@ -8,13 +8,21 @@ import { CreateNoteTransactionScript } from "./domain/transaction-scripts/create
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Module } from "@nestjs/common";
 import { NoteTagRepository } from "./infra/repositories/note-tag.repository";
+import { GetNoteByIdAction } from './apps/actions/get-note-by-id.action';
+import { GetNoteByIdTransactionScript } from './domain/transaction-scripts/get-note-by-id.transaction.script';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Note, Memo, Tag, TagNote])],
-  controllers: [getNoteNamesByUserIdAction, CreateNoteAction],
+  controllers: [
+    getNoteNamesByUserIdAction,
+    CreateNoteAction,
+    GetNoteByIdAction
+  ],
   providers: [
     CreateNoteTransactionScript,
-    NoteTagRepository
+    GetNoteByIdTransactionScript,
+    NoteTagRepository,
   ],
+  exports: [NoteTagRepository]
 })
 export class NotesModule {}
