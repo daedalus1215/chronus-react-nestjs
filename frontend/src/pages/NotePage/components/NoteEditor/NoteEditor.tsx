@@ -24,25 +24,75 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
   const [title, setTitle] = React.useState(note.name);
   const [description, setDescription] = React.useState(note.description || '');
   const [isDirty, setIsDirty] = React.useState(false);
+  const saveTimeoutRef = React.useRef<number>();
+  const lastSavedRef = React.useRef<{title: string; description: string}>({
+    title: note.name,
+    description: note.description || ''
+  });
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-    setIsDirty(true);
-  };
+  const triggerSave = React.useCallback(() => {
+    if (!isDirty) return;
+    
+    const currentContent = { title, description };
+    const lastSaved = lastSavedRef.current;
+    
+    // Only save if content has actually changed
+    if (lastSaved.title === currentContent.title && 
+        lastSaved.description === currentContent.description) {
+      return;
+    }
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDescription(e.target.value);
-    setIsDirty(true);
-  };
-
-  const handleSave = () => {
     onSave({
       ...note,
       name: title,
       description
     });
+    
+    lastSavedRef.current = currentContent;
     setIsDirty(false);
+  }, [title, description, isDirty, note, onSave]);
+
+  const debouncedSave = React.useCallback(() => {
+    // Clear any existing timeout
+    if (saveTimeoutRef.current) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Set new timeout
+    saveTimeoutRef.current = window.setTimeout(triggerSave, 2000);
+  }, [triggerSave]);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+    setIsDirty(true);
+    debouncedSave();
   };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
+    setIsDirty(true);
+    debouncedSave();
+  };
+
+  // Manual save button handler
+  const handleManualSave = () => {
+    if (saveTimeoutRef.current) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+    triggerSave();
+  };
+
+  // Save on unmount if there are pending changes
+  React.useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+      if (isDirty) {
+        triggerSave();
+      }
+    };
+  }, [isDirty, triggerSave]);
 
   // Auto-resize textarea as content grows
   React.useEffect(() => {
@@ -74,7 +124,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
       {isDirty && (
         <button 
           className={styles.saveButton}
-          onClick={handleSave}
+          onClick={handleManualSave}
           disabled={isLoading}
         >
           {isLoading ? 'Saving...' : 'Save changes'}
