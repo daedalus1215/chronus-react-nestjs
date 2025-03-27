@@ -16,98 +16,89 @@ type NoteEditorProps = {
   isLoading?: boolean;
 }
 
+type NoteContent = {
+  title: string;
+  description: string;
+}
+
 export const NoteEditor: React.FC<NoteEditorProps> = ({ 
   note, 
   onSave,
   isLoading = false 
 }) => {
-  const [title, setTitle] = React.useState(note.name);
-  const [description, setDescription] = React.useState(note.description || '');
-  const [isDirty, setIsDirty] = React.useState(false);
-  const saveTimeoutRef = React.useRef<number>();
-  const lastSavedRef = React.useRef<{title: string; description: string}>({
+  const [content, setContent] = React.useState<NoteContent>({
     title: note.name,
     description: note.description || ''
   });
+  const [isDirty, setIsDirty] = React.useState(false);
+  const timeoutRef = React.useRef<number>();
+  const contentRef = React.useRef(content);
 
-  const triggerSave = React.useCallback(() => {
-    if (!isDirty) return;
-    
-    const currentContent = { title, description };
-    const lastSaved = lastSavedRef.current;
-    
-    // Only save if content has actually changed
-    if (lastSaved.title === currentContent.title && 
-        lastSaved.description === currentContent.description) {
-      return;
-    }
+  // Update contentRef when content changes
+  React.useEffect(() => {
+    contentRef.current = content;
+  }, [content]);
 
+  const saveChanges = React.useCallback(() => {
+    const currentContent = contentRef.current;
     onSave({
       ...note,
-      name: title,
-      description
+      name: currentContent.title,
+      description: currentContent.description
     });
-    
-    lastSavedRef.current = currentContent;
     setIsDirty(false);
-  }, [title, description, isDirty, note, onSave]);
+  }, [note, onSave]);
 
   const debouncedSave = React.useCallback(() => {
-    // Clear any existing timeout
-    if (saveTimeoutRef.current) {
-      window.clearTimeout(saveTimeoutRef.current);
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
     }
+    timeoutRef.current = window.setTimeout(saveChanges, 2000);
+  }, [saveChanges]);
 
-    // Set new timeout
-    saveTimeoutRef.current = window.setTimeout(triggerSave, 2000);
-  }, [triggerSave]);
-
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
+  const handleContentChange = React.useCallback((updates: Partial<NoteContent>) => {
+    setContent(prev => ({ ...prev, ...updates }));
     setIsDirty(true);
     debouncedSave();
+  }, [debouncedSave]);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleContentChange({ title: e.target.value });
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDescription(e.target.value);
-    setIsDirty(true);
-    debouncedSave();
+    handleContentChange({ description: e.target.value });
   };
 
-  // Manual save button handler
   const handleManualSave = () => {
-    if (saveTimeoutRef.current) {
-      window.clearTimeout(saveTimeoutRef.current);
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
     }
-    triggerSave();
+    saveChanges();
   };
 
-  // Save on unmount if there are pending changes
+  // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      if (saveTimeoutRef.current) {
-        window.clearTimeout(saveTimeoutRef.current);
-      }
-      if (isDirty) {
-        triggerSave();
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
       }
     };
-  }, [isDirty, triggerSave]);
+  }, []);
 
-  // Auto-resize textarea as content grows
   React.useEffect(() => {
     const textarea = document.getElementById('note-description') as HTMLTextAreaElement;
     if (textarea) {
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
-  }, [description]);
+  }, [content.description]);
 
   return (
     <div className={styles.editor}>
       <input
         type="text"
-        value={title}
+        value={content.title}
         onChange={handleTitleChange}
         className={styles.titleInput}
         placeholder="Note title"
@@ -115,7 +106,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
       />
       <textarea
         id="note-description"
-        value={description}
+        value={content.description}
         onChange={handleDescriptionChange}
         className={styles.descriptionInput}
         placeholder="Start typing your note..."
