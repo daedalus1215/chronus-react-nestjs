@@ -8,10 +8,7 @@ type User = {
 export const GetAuthUser = createParamDecorator(
   (data: keyof User | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-
-    console.log('asdasdas', request);
     const user = request.user;
-
     return data ? user?.[data] : user;
   },
 ); 
