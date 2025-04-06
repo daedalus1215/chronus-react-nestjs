@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NoteActions } from './NoteActionGrid/NoteActionGrid';
+import { NoteActionsGrid } from './NoteActionGrid/NoteActionGrid';
 import { DateTimePicker } from './DateTimePicker/DateTimePicker';
 import { TimeTrackingForm, TimeTrackingData } from './TimeTrackingForm/TimeTrackingForm';
 import styles from './NoteItem.module.css';
@@ -110,13 +110,21 @@ export const NoteItem: React.FC<NoteItemProps> = ({ note }) => {
         </button>
       </div>
 
-      <NoteActions
+      <NoteActionsGrid
         isOpen={isActionsOpen}
         onClose={() => setIsActionsOpen(false)}
         onShare={handleShare}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}
         onTimeTracking={handleTimeTracking}
+        //@TODO: Implement these later
+        onPin={handleTimeTracking}
+        onArchive={handleTimeTracking}
+        onStar={handleTimeTracking}
+        onExport={handleTimeTracking}
+        onLock={handleTimeTracking}
+        onEdit={handleTimeTracking}
+        onLabel={handleTimeTracking}
       />
 
       <DateTimePicker
@@ -134,3 +142,8 @@ export const NoteItem: React.FC<NoteItemProps> = ({ note }) => {
     </>
   );
 }
+function updateNoteSchedule(id: number, dateTime: Date) {
+  console.log(id, dateTime);
+  throw new Error('Function not implemented.');
+}
+
