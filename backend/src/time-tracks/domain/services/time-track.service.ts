@@ -11,7 +11,12 @@ export class TimeTrackService {
   ) {}
 
   async createTimeTrack(command: CreateTimeTrackCommand) {
-    await this.noteAggregator.belongsToUser(command);
+    await this.noteAggregator.belongsToUser({
+      noteId: command.noteId,
+      user: {
+        id: parseInt(command.user.id)
+      }
+    });
     return this.createTimeTrackTS.apply(command);
   }
 }

@@ -20,12 +20,10 @@ export class CreateTimeTrackAction {
   @ProtectedAction(CreateTimeTrackSwagger)
   async apply(
     @Body() dto: CreateTimeTrackDto,
-    @Param('noteId', ParseIntPipe) noteId: number,
     @GetAuthUser('userId') userId: string
   ) {
     return this.timeTrackService.createTimeTrack({
       ...dto,
-      noteId,
       user: {
         id: userId,
         username: userId

@@ -7,6 +7,7 @@ type TimeTrackingFormProps = {
   onClose: () => void;
   onSubmit: (data: TimeTrackingData) => void;
   initialData?: TimeTrackingData;
+  isSubmitting?: boolean;
 }
 
 export type TimeTrackingData = {
@@ -20,7 +21,8 @@ export const TimeTrackingForm: React.FC<TimeTrackingFormProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  initialData
+  initialData,
+  isSubmitting
 }) => {
   const [formData, setFormData] = useState<TimeTrackingData>(initialData || {
     date: new Date().toISOString().split('T')[0],
@@ -117,8 +119,9 @@ export const TimeTrackingForm: React.FC<TimeTrackingFormProps> = ({
               type="submit"
               className={styles.button}
               data-variant="primary"
+              disabled={isSubmitting}
             >
-              Save Time Entry
+              {isSubmitting ? 'Saving...' : 'Save Time Entry'}
             </button>
           </div>
         </form>

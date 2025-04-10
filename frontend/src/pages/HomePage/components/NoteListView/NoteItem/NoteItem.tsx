@@ -4,6 +4,7 @@ import { NoteActionsGrid } from './NoteActionGrid/NoteActionGrid';
 import { DateTimePicker } from './DateTimePicker/DateTimePicker';
 import { TimeTrackingForm, TimeTrackingData } from './TimeTrackingForm/TimeTrackingForm';
 import styles from './NoteItem.module.css';
+import { useCreateTimeTrack } from '../../../hooks/useCreateTimeTrack/useCreateTimeTrack';
 
 interface Note {
   id: number;
@@ -23,6 +24,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({ note }) => {
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimeTrackingOpen, setIsTimeTrackingOpen] = useState(false);
+  const { createTimeTrack, isCreating, error } = useCreateTimeTrack();
 
   const handleClick = () => {
     navigate(`/notes/${note.id}`);
@@ -72,13 +74,19 @@ export const NoteItem: React.FC<NoteItemProps> = ({ note }) => {
 
   const handleTimeTrackingSubmit = async (data: TimeTrackingData) => {
     try {
-      // TODO: Implement API call to save time tracking data
-      console.log('Time tracking data:', data);
+      await createTimeTrack({
+        date: data.date,
+        startTime: data.startTime,
+        durationMinutes: data.durationMinutes,
+        noteId: note.id,
+        note: data.note
+      });
+
       setIsTimeTrackingOpen(false);
-      // Show success message
+      // TODO: Add success toast
     } catch (error) {
-      console.error('Failed to save time tracking:', error);
-      // Show error message
+      // Error handling is now done in the hook
+      // TODO: Add error toast
     }
   };
 
@@ -138,6 +146,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({ note }) => {
         isOpen={isTimeTrackingOpen}
         onClose={() => setIsTimeTrackingOpen(false)}
         onSubmit={handleTimeTrackingSubmit}
+        isSubmitting={isCreating}
       />
     </>
   );

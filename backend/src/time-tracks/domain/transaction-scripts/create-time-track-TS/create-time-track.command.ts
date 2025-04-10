@@ -1,6 +1,6 @@
 export type CreateTimeTrackCommand = {  
   noteId: number;
-  date: Date;
+  date: string;
   startTime: string;
   durationMinutes: number;
   note?: string;
