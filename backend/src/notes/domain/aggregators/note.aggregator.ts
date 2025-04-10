@@ -30,10 +30,11 @@ export class NoteAggregator {
     };
   }
 
-  async belongsToUser(params:{noteId: number, user:{id: string}}) {
+  async belongsToUser(params:{noteId: number, user:{id: number}}) {
     //@TODO: refactor to use transaction script
     const note = await this.noteRepository.findById(params.noteId);
-    if (note?.userId !== params.user.id) {
+
+    if (parseInt(note.userId) !== params.user.id) {
       throw new ForbiddenException('Not authorized to access this note');
     }
   }
