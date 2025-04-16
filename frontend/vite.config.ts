@@ -92,7 +92,7 @@ export default defineConfig({
     outDir: 'dist'
   },
   preview: {
-    allowedHosts: ['chronus.cn-an.com'], // or 'chronus.cc-an.com' if that's what you're sticking with
+    allowedHosts: ['chronus.cc-an.com'], // or 'chronus.cc-an.com' if that's what you're sticking with
     host: '0.0.0.0',
     port: parseInt(process.env.VITE_PORT || '5173'),
     proxy: {
