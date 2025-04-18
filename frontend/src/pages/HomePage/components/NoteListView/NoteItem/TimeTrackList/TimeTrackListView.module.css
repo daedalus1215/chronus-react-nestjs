@@ -1,81 +1,18 @@
 .container {
-  padding: 20px;
-}
-
-.title {
-  margin: 0 0 20px;
-  font-size: 1.25rem;
-  color: #fff;
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.timeTrackItem {
-  padding: 16px;
-  background-color: #1a1a1a;
-  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 16px;
 }
 
-.timeTrackHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
 }
 
-.timeTrackDate {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #fff;
-}
-
-.timeTrackDuration {
-  font-size: 0.875rem;
-  color: #6366f1;
-  font-weight: 500;
-  padding: 4px 8px;
-  background-color: rgba(99, 102, 241, 0.1);
-  border-radius: 9999px;
-}
-
-.timeTrackTime {
-  font-size: 0.875rem;
-  color: #9ca3af;
-}
-
-.timeTrackNote {
-  font-size: 0.875rem;
-  color: #d1d5db;
-  padding: 8px;
-  background-color: #262626;
-  border-radius: 4px;
-  margin-top: 4px;
-}
-
-.loading {
-  text-align: center;
-  padding: 2rem;
-  color: #9ca3af;
-}
-
-.error {
-  text-align: center;
-  padding: 2rem;
-  color: #ef4444;
-  background-color: rgba(239, 68, 68, 0.1);
-  border-radius: 8px;
-}
-
-.empty {
-  text-align: center;
-  padding: 2rem;
-  color: #9ca3af;
-  background-color: #1a1a1a;
-  border-radius: 8px;
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 } 
