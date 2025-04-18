@@ -4,12 +4,11 @@ import { CreateTimeTrackTransactionScript } from '../transaction-scripts/create-
 import { CreateTimeTrackCommand } from '../transaction-scripts/create-time-track-TS/create-time-track.command';
 import { GetNoteTimeTracksTransactionScript } from '../transaction-scripts/get-note-time-tracks-TS/get-note-time-tracks.transaction.script';
 import { GetNoteTimeTracksCommand } from '../transaction-scripts/get-note-time-tracks-TS/get-note-time-tracks.command';
+import { AuthUser } from 'src/auth/app/decorators/get-auth-user.decorator';
 
 type ValidateTimeTrackCreationCommand = {
   noteId: number;
-  user: {
-    id: string;
-  };
+  user: AuthUser;
 };
 
 @Injectable()
@@ -29,7 +28,7 @@ export class TimeTrackService {
     await this.noteAggregator.belongsToUser({
       noteId: command.noteId,
       user: {
-        id: parseInt(command.user.id)
+        id: parseInt(command.user.userId)
       }
     });
   }

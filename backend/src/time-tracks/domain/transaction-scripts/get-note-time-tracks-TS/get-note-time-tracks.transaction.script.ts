@@ -9,7 +9,7 @@ export class GetNoteTimeTracksTransactionScript {
 
   async apply(command: GetNoteTimeTracksCommand) {
     return this.timeTrackRepository.findByUserIdAndNoteId(
-      command.user.id,
+      command.user.userId,
       command.noteId
     );
   }
