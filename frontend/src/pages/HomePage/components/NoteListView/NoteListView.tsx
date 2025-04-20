@@ -1,6 +1,7 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import { useNotes } from "../../hooks/useNotes";
 import { NoteItem } from "./NoteItem/NoteItem";
+import { SearchBar } from "./SearchBar/SearchBar";
 import styles from "./NoteListView.module.css";
 
 const LoadingSpinner: React.FC = () => (
@@ -60,31 +61,15 @@ export const NoteListView: React.FC = () => {
     return <div className={styles.noteListError}>{error}</div>;
   }
 
-  if (notes.length === 0) {
-    return <div className={styles.noteListEmpty}>No notes found</div>;
-  }
 
   return (
     <div className={styles.noteList}>
       <div className={styles.noteListHeader}>
-        <div className={styles.searchContainer}>
-          <input
-            type="text"
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => searchNotes(e.target.value)}
-            className={styles.searchInput}
-          />
-          {searchQuery && (
-            <button 
-              onClick={clearSearch}
-              className={styles.clearButton}
-              aria-label="Clear search"
-            >
-              ×
-            </button>
-          )}
-        </div>
+        <SearchBar 
+          value={searchQuery}
+          onChange={searchNotes}
+          onClear={clearSearch}
+        />
       </div>
       <div className={styles.noteListContent}>
         {hasPendingChanges && (
