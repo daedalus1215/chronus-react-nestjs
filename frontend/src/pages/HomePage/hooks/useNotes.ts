@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useOnlineStatus } from '../../../hooks/useOnlineStatus';
-import { noteDB, Note } from '../../../services/indexedDB/noteDB';
 import api from '../../../api/axios.interceptor';
 
 type NoteResponse = {
