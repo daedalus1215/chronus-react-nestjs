@@ -4,19 +4,19 @@ import { ProtectedAction } from '../../decorators/protected-action.decorator';
 import { AuthUser, GetAuthUser } from 'src/auth/app/decorators/get-auth-user.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { GetNoteTimeTracksSwagger } from './get-note-time-tracks.swagger';
+import { GetTimeTracksByNoteIdSwagger } from './get-time-tracks-by-note-id.swagger';
 
 @Controller('time-tracks')
 @UseGuards(JwtAuthGuard)
 @ApiTags('Time Tracks')
 @ApiBearerAuth()
-export class GetNoteTimeTracksAction {
+export class GetTimeTracksByNoteIdAction {
   constructor(
     private readonly timeTrackService: TimeTrackService
   ) {}
 
   @Get('note/:noteId')
-  @ProtectedAction(GetNoteTimeTracksSwagger)
+  @ProtectedAction(GetTimeTracksByNoteIdSwagger)
   async apply(
     @Param('noteId', ParseIntPipe) noteId: number,
     @GetAuthUser() user: AuthUser
