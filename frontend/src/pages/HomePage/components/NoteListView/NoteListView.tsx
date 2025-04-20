@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useNotes } from "../../hooks/useNotes";
 import { NoteItem } from "./NoteItem/NoteItem";
 import styles from "./NoteListView.module.css";
@@ -18,7 +18,10 @@ export const NoteListView: React.FC = () => {
     error, 
     hasMore, 
     loadMore,
-    hasPendingChanges 
+    hasPendingChanges,
+    searchNotes,
+    clearSearch,
+    searchQuery
   } = useNotes();
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -64,10 +67,24 @@ export const NoteListView: React.FC = () => {
   return (
     <div className={styles.noteList}>
       <div className={styles.noteListHeader}>
-        {/* <h2 className={styles.noteListTitle}>Recent</h2> */}
-        {/* <button className={styles.sortButton}>
-          Default ↓
-        </button> */}
+        <div className={styles.searchContainer}>
+          <input
+            type="text"
+            placeholder="Search notes..."
+            value={searchQuery}
+            onChange={(e) => searchNotes(e.target.value)}
+            className={styles.searchInput}
+          />
+          {searchQuery && (
+            <button 
+              onClick={clearSearch}
+              className={styles.clearButton}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
+        </div>
       </div>
       <div className={styles.noteListContent}>
         {hasPendingChanges && (
