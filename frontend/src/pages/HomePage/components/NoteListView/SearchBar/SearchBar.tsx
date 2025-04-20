@@ -37,7 +37,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onClear }
   }, [isOpen, onClear]);
 
   return (
-    <div className={styles.searchContainer}>
+    <div className={`${styles.searchContainer} ${isOpen ? styles.open : ''}`}>
       <button 
         onClick={handleToggle}
         className={styles.searchButton}

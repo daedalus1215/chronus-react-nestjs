@@ -62,15 +62,14 @@ export const NoteListView: React.FC = () => {
   }
 
 
+
   return (
     <div className={styles.noteList}>
-      <div className={styles.noteListHeader}>
         <SearchBar 
           value={searchQuery}
           onChange={searchNotes}
           onClear={clearSearch}
         />
-      </div>
       <div className={styles.noteListContent}>
         {hasPendingChanges && (
           <div className={styles.offlineNotice}>
