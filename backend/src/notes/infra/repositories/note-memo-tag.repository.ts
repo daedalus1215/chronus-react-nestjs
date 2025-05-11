@@ -21,6 +21,7 @@ export class NoteMemoTagRepository {
             .createQueryBuilder('note')
             .leftJoinAndSelect('note.memo', 'memo')
             .leftJoinAndSelect('note.tags', 'tags')
+            .leftJoinAndSelect('note.checklist', 'checklist')
             .where('note.id = :id', { id })
             .getOne();
     }
@@ -50,18 +51,19 @@ export class NoteMemoTagRepository {
         cursor: number,
         limit = 20,
         query?: string
-    ): Promise<{name:string, id:number}[]> {
+    ): Promise<{name:string, id:number, isMemo:number}[]> {
         const qb = this.repository
             .createQueryBuilder("note")
             .select("note.name", "name")
             .addSelect("note.id", "id")
+            .addSelect("CASE WHEN note.memo_id IS NOT NULL THEN 1 ELSE 0 END", "isMemo")
             .where("note.user_id = :userId", { userId });
 
         if (query) {
             qb.andWhere("LOWER(note.name) LIKE LOWER(:query)", { query: `%${query}%` });
         }
 
-        return qb
+        return await qb
             .orderBy("note.updated_at", "DESC")
             .skip(cursor)
             .take(limit)
