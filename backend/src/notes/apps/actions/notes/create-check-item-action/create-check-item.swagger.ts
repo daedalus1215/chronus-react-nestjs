@@ -18,5 +18,5 @@ export const CreateCheckItemSwagger: ProtectedActionOptions = {
       status: 404,
       description: 'Note not found.'
     }
-  ]
+  ]     
 }; 
