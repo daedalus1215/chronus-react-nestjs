@@ -10,9 +10,6 @@ import { Note } from "./note.entity";
 
 @Entity("check_items")
 export class CheckItem extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column()
   name: string;
 
