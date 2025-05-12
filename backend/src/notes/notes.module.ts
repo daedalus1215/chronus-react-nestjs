@@ -15,11 +15,10 @@ import { UpdateNoteTransactionScript } from "./domain/transaction-scripts/update
 import { NoteDtoToEntityConverter } from "./domain/transaction-scripts/update-note-TS/note-dto-to-entity.converter";
 import { NoteAggregator } from './domain/aggregators/note.aggregator';
 import { UpdateNoteTimestampAction } from './apps/actions/update-note-timestamp.action';
-import { Checklist } from "./domain/entities/notes/checklist/checklist.entity";
-import { ChecklistItem } from "./domain/entities/notes/checklist/checklistitem.entity";
+import { CheckItem } from "./domain/entities/notes/check-item.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Note, Memo, Tag, TagNote, Checklist, ChecklistItem])],
+  imports: [TypeOrmModule.forFeature([Note, Memo, Tag, TagNote, CheckItem])],
   controllers: [
     GetNoteNamesByUserIdAction,
     CreateNoteAction,

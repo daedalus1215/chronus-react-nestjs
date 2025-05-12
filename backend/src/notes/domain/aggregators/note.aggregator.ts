@@ -41,6 +41,6 @@ export class NoteAggregator {
 
   async isArchived(noteId: number): Promise<boolean> {
     const note = await this.noteRepository.findById(noteId);
-    return note?.archived_date !== null;
+    return note?.archivedDate !== null;
   }
 } 
