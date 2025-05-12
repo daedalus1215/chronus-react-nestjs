@@ -16,6 +16,8 @@ import { NoteDtoToEntityConverter } from "./domain/transaction-scripts/update-no
 import { NoteAggregator } from './domain/aggregators/note.aggregator';
 import { UpdateNoteTimestampAction } from './apps/actions/update-note-timestamp.action';
 import { CheckItem } from "./domain/entities/notes/check-item.entity";
+import { CreateCheckItemAction } from './apps/actions/notes/create-check-item-action/create-check-item.action';
+import { CreateCheckItemTransactionScript } from './domain/transaction-scripts/create-check-item.transaction.script';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Note, Memo, Tag, TagNote, CheckItem])],
@@ -24,7 +26,8 @@ import { CheckItem } from "./domain/entities/notes/check-item.entity";
     CreateNoteAction,
     GetNoteByIdAction,
     UpdateNoteAction,
-    UpdateNoteTimestampAction
+    UpdateNoteTimestampAction,
+    CreateCheckItemAction,
   ],
   providers: [
     NoteDtoToEntityConverter,
@@ -33,6 +36,7 @@ import { CheckItem } from "./domain/entities/notes/check-item.entity";
     UpdateNoteTransactionScript,
     NoteMemoTagRepository,
     NoteAggregator,
+    CreateCheckItemTransactionScript,
   ],
   exports: [
     NoteMemoTagRepository,

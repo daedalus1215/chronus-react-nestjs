@@ -45,6 +45,6 @@ export class Note extends BaseEntity {
   })
   tags: Tag[];
 
-  @OneToMany(() => CheckItem, (checkItem) => checkItem.noteId)
+  @OneToMany(() => CheckItem, (checkItem) => checkItem.note)
   checkItems: CheckItem[];
 }

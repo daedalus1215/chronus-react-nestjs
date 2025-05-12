@@ -19,9 +19,7 @@ export class CheckItem extends BaseEntity {
   @Column({ name: "archive_date" })
   archiveDate: Date;
 
-  @JoinColumn({ name: "note_id" })
-  noteId: number;
-
   @ManyToOne(() => Note, (note) => note.checkItems, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "note_id" }) 
   note: Note;
 }
