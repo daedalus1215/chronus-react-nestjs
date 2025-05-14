@@ -12,11 +12,13 @@ export class GetCheckItemTransactionScript {
   ) {}
 
   async apply(id: number, authUser: AuthUser): Promise<CheckItem> {
+    //@TODO: Move this into a repository
     const checkItem = await this.checkItemRepository
       .createQueryBuilder('checkItem')
       .leftJoinAndSelect('checkItem.note', 'note')
       .where('checkItem.id = :id', { id })
       .andWhere('note.userId = :userId', { userId: authUser.userId })
+      .andWhere('checkItem.archived_date IS NULL')
       .getOne();
 
     if (!checkItem) {
