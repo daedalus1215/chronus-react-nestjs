@@ -16,14 +16,14 @@ export const useCreateNote = () => {
   const [error, setError] = useState<string | null>(null);
 
   const createNote = async (type: keyof typeof NOTE_TYPES) => {
-    try {
+    try { 
       setIsCreating(true);
       setError(null);
 
       const response = await api.post<Note>(
         '/notes',
         {
-          name: 'Untitled Note',
+          name: type === NOTE_TYPES.MEMO ? 'Memo' : 'Checklist',
           isMemo: type === NOTE_TYPES.MEMO
         }
       );

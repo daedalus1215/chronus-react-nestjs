@@ -21,7 +21,6 @@ export class CreateNoteTransactionScript {
     const note = new Note();
     note.name = name;
     note.userId = userId;
-
     if (isMemo) {
       const memo = new Memo();
       memo.description = "";

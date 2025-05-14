@@ -19,6 +19,7 @@ export class NoteMemoTagRepository {
     async findById(id: number, userId: string): Promise<Note | null> {
         return this.repository
             .createQueryBuilder('note')
+            .addSelect("CASE WHEN note.memo_id IS NOT NULL THEN 1 ELSE 0 END", "isMemo")
             .leftJoinAndSelect('note.memo', 'memo')
             .leftJoinAndSelect('note.tags', 'tags')
             .leftJoinAndSelect('note.checkItems', 'checkItems')

@@ -61,14 +61,6 @@ export const CheckListView:React.FC<CheckListViewProps> = ({note}) => {
 
   return (
     <div className={styles.pageWrapper}>
-      <input
-        type="text"
-        value={noteState.name}
-        onChange={e => setNewItem(e.target.value)}
-        className={styles.titleInput}
-        placeholder="Note title"
-        aria-label="Note title"
-      />
       <div className={styles.container}>
         <input
           className={styles.addInput}

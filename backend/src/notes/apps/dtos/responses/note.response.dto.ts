@@ -31,6 +31,9 @@ export class NoteResponseDto {
   @ApiProperty({ type: [CheckItem] })
   checkItems: CheckItem[];
 
+  @ApiProperty()
+  isMemo: boolean;
+
   constructor(note: Note) {
     this.id = note.id;
     this.name = note.name;
@@ -41,5 +44,6 @@ export class NoteResponseDto {
     this.description = note.memo?.description || '';
     this.tags = note.tags;
     this.checkItems = note.checkItems;
+    this.isMemo = note.memo !== null;
   }
 } 
