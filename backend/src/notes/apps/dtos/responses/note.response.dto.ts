@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Note } from '../../../domain/entities/notes/note.entity';
 import { Tag } from '../../../domain/entities/tag/tag.entity';
+import { CheckItem } from 'src/notes/domain/entities/notes/check-item.entity';
 
 export class NoteResponseDto {
   @ApiProperty()
@@ -27,6 +28,9 @@ export class NoteResponseDto {
   @ApiProperty()
   description: string;
 
+  @ApiProperty({ type: [CheckItem] })
+  checkItems: CheckItem[];
+
   constructor(note: Note) {
     this.id = note.id;
     this.name = note.name;
@@ -36,5 +40,6 @@ export class NoteResponseDto {
     this.updatedAt = new Date(note.updatedAt);
     this.description = note.memo?.description || '';
     this.tags = note.tags;
+    this.checkItems = note.checkItems;
   }
 } 
