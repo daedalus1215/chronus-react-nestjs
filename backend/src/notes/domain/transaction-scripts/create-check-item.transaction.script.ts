@@ -8,6 +8,8 @@ import { AuthUser } from "src/auth/app/decorators/get-auth-user.decorator";
 
 @Injectable()
 export class CreateCheckItemTransactionScript {
+
+  //@TODO: Need to migrate these into legit repo
   constructor(
     @InjectRepository(CheckItem)
     private readonly checkItemRepository: Repository<CheckItem>,
@@ -15,7 +17,7 @@ export class CreateCheckItemTransactionScript {
     private readonly noteRepository: Repository<Note>
   ) {}
 
-  async apply(createCheckItemDto: CreateCheckItemDto & { authUser: AuthUser}): Promise<CheckItem> {
+  async apply(createCheckItemDto: CreateCheckItemDto & { authUser: AuthUser}): Promise<Note> {
     const { name, noteId, authUser } = createCheckItemDto;
 
     //@TODO: Creating coupling between note validation and check-item TS. This note could come from a NoteAggregator, and this could be orchestrated in a CheckItemService. 
@@ -28,9 +30,8 @@ export class CreateCheckItemTransactionScript {
     const checkItem = new CheckItem();
     checkItem.name = name;
     checkItem.note = note;
-    checkItem.doneDate = new Date();
-    checkItem.archiveDate = new Date();
-
-    return this.checkItemRepository.save(checkItem);
+    await this.checkItemRepository.save(checkItem)
+    const checkItems = await this.checkItemRepository.findBy({ note: { id: noteId } })  
+    return {...note, checkItems: checkItems}
   }
 } 
