@@ -17,7 +17,7 @@ type UseCheckListReturn = {
     setNoteState: (note: NoteContent) => void;
     error: string | null;
     addItem: (name: string) => Promise<Note>;
-    toggleItem: (id: number) => Promise<Note>;
+    toggleItem: (id: number, note:Note) => Promise<Note>;
     deleteItem: (id: number) => Promise<Note>;
     updateItem: (id: number, name: string) => Promise<Note>;
 }
@@ -41,12 +41,14 @@ export const useCheckItems = (note: Note): UseCheckListReturn => {
     }
   };
 
-  const toggleItem = async (id: number) => {
+  const toggleItem = async (id: number, note: Note) => {
+    if (!note.checkItems) {
+      throw new Error('No check items found');
+    }
+
     try {
       const response = await api.patch(`/notes/check-items/${id}/toggle`);
-      setNoteState(prev => 
-        prev.checkItems.map(item => item.id === id ? response.data : item)
-      );
+      setNoteState({...note, checkItems: note.checkItems.map(item => item.id === id ? response.data : item)});
       return response.data;
     } catch (err) {
       console.error('Error toggling check item:', err);

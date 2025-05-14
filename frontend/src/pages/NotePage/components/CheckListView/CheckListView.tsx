@@ -18,6 +18,8 @@ export const CheckListView:React.FC<CheckListViewProps> = ({note}) => {
     updateItem 
   } = useCheckItems(note);
 
+  //@TODO: Let's clean up all these chatty handlers
+  
   const handleAdd = async () => {
     if (!newItem.trim()) return;
     try {
@@ -31,7 +33,7 @@ export const CheckListView:React.FC<CheckListViewProps> = ({note}) => {
 
   const handleToggle = async (id: number) => {
     try {
-      await toggleItem(id);
+      await toggleItem(id, noteState);
     } catch (err) {
       console.error('Failed to toggle item:', err);
     }
@@ -57,7 +59,6 @@ export const CheckListView:React.FC<CheckListViewProps> = ({note}) => {
     return <div className={styles.error}>{error}</div>;
   }
 
-  console.log('noteState', noteState);
   return (
     <div className={styles.pageWrapper}>
       <input
