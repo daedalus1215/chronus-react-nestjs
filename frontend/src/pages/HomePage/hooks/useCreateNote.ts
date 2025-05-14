@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../api/axios.interceptor';
+import { NOTE_TYPES } from '../../../constant';
 
 type Note = {
   id: number;
@@ -14,7 +15,7 @@ export const useCreateNote = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createNote = async (type: 'memo' | 'checklist') => {
+  const createNote = async (type: keyof typeof NOTE_TYPES) => {
     try {
       setIsCreating(true);
       setError(null);
@@ -23,11 +24,10 @@ export const useCreateNote = () => {
         '/notes',
         {
           name: 'Untitled Note',
-          isMemo: type === 'memo'
+          isMemo: type === NOTE_TYPES.MEMO
         }
       );
 
-      // Navigate to the new note
       navigate(`/notes/${response.data.id}`);
     } catch (err) {
       console.error('Error creating note:', err);

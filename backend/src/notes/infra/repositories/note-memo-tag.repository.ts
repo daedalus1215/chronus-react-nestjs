@@ -16,13 +16,15 @@ export class NoteMemoTagRepository {
         private readonly memoRepository: Repository<Memo>
     ) {}
 
-    async findById(id: number): Promise<Note | null> {
+    async findById(id: number, userId: string): Promise<Note | null> {
         return this.repository
             .createQueryBuilder('note')
             .leftJoinAndSelect('note.memo', 'memo')
             .leftJoinAndSelect('note.tags', 'tags')
-            .leftJoinAndSelect('note.checklist', 'checklist')
+            .leftJoinAndSelect('note.checkItems', 'checkItems')
             .where('note.id = :id', { id })
+            .andWhere('note.archived_date IS NULL')
+            .andWhere('note.user_id = :userId', { userId })
             .getOne();
     }
 
