@@ -15,6 +15,8 @@ function AppRoutes() {
       <>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/memos" element={<HomePage />} />
+          <Route path="/checklists" element={<HomePage />} />
           <Route path="/notes/:id" element={<NotePage />} />
           {/* Redirect authenticated users trying to access auth pages */}
           <Route path="/login" element={<Navigate to="/" replace />} />

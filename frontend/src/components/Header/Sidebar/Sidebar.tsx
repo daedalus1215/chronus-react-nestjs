@@ -33,11 +33,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <Link to="/" className={styles.navItem}>
             <span className={styles.navText}>Home</span>
           </Link>
-          <Link to="/notes" className={styles.navItem}>
-            <span className={styles.navText}>Notes</span>
-          </Link>
           <Link to="/memos" className={styles.navItem}>
             <span className={styles.navText}>Memos</span>
+          </Link>
+          <Link to="/checklists" className={styles.navItem}>
+            <span className={styles.navText}>CheckLists</span>
           </Link>
           <Link to="/tags" className={styles.navItem}>
             <span className={styles.navText}>Tags</span>
