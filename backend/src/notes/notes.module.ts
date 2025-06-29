@@ -25,6 +25,8 @@ import { ToggleCheckItemTransactionScript } from './domain/transaction-scripts/t
 import { UpdateNoteTitleAction } from "./apps/actions/notes/update-note-title-action/update-note-title.action";
 import { UpdateNoteTitleTransactionScript } from "./domain/transaction-scripts/update-note-TS/update-note-title.transaction.script";
 import { DeleteNoteAction } from './apps/actions/notes/delete-note.action';
+import { DeleteCheckItemAction } from './apps/actions/notes/delete-check-item.action';
+import { DeleteCheckItemTransactionScript } from './domain/transaction-scripts/delete-check-item.transaction.script';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Note, Memo, Tag, TagNote, CheckItem])],
@@ -38,7 +40,8 @@ import { DeleteNoteAction } from './apps/actions/notes/delete-note.action';
     GetCheckItemAction,
     ToggleCheckItemAction,
     UpdateNoteTitleAction,
-    DeleteNoteAction
+    DeleteNoteAction,
+    DeleteCheckItemAction
   ],
   providers: [
     NoteDtoToEntityConverter,
@@ -50,7 +53,8 @@ import { DeleteNoteAction } from './apps/actions/notes/delete-note.action';
     CreateCheckItemTransactionScript,
     GetCheckItemTransactionScript,
     ToggleCheckItemTransactionScript,
-    UpdateNoteTitleTransactionScript
+    UpdateNoteTitleTransactionScript,
+    DeleteCheckItemTransactionScript
   ],
   exports: [
     NoteMemoTagRepository,

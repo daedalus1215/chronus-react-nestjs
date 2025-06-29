@@ -20,7 +20,6 @@ export class DeleteNoteAction {
     @Param('id') id: string,
     @GetAuthUser('userId') userId: string
   ): Promise<void> {
-    // Optionally, check if note exists first and throw 404 if not
     const note = await this.noteRepository.findById(Number(id), userId);
     if (!note) throw new NotFoundException('Note not found');
     await this.noteRepository.deleteNoteById(Number(id), userId);
