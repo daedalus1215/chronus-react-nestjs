@@ -100,4 +100,8 @@ export class NoteMemoTagRepository {
             throw error;
         }
     }
+
+    async deleteNoteById(id: number, userId: string): Promise<void> {
+        await this.repository.delete({ id, userId });
+    }
 } 
