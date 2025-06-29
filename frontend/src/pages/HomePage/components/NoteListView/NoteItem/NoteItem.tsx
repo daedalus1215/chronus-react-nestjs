@@ -28,7 +28,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({ note }) => {
   const [isTimeTrackingOpen, setIsTimeTrackingOpen] = useState(false);
   const [isTimeTrackListOpen, setIsTimeTrackListOpen] = useState(false);
   const { createTimeTrack, isCreating } = useCreateTimeTrack();
-  const { timeTracks, isLoading, error } = useNoteTimeTracks(note.id, isTimeTrackListOpen);
+  const { timeTracks, isLoading } = useNoteTimeTracks(note.id, isTimeTrackListOpen);
 
   const handleClick = () => {
     navigate(`/notes/${note.id}`);
