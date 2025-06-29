@@ -2,7 +2,16 @@ import React, { useState } from "react";
 import { useCheckItems } from "../../hooks/useCheckItems";
 import styles from "./CheckListView.module.css";
 import { Note } from "../../api/responses";
-import { Button } from "../../../../components/ui/button";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 
 type CheckListViewProps = {
   note: Note;
@@ -10,10 +19,7 @@ type CheckListViewProps = {
 
 export const CheckListView: React.FC<CheckListViewProps> = ({ note }) => {
   const [newItem, setNewItem] = useState("");
-  const { noteState, error, addItem, toggleItem, deleteItem, updateItem } =
-    useCheckItems(note);
-
-  //@TODO: Let's clean up all these chatty handlers
+  const { noteState, error, addItem, toggleItem, deleteItem, updateItem } = useCheckItems(note);
 
   const handleAdd = async () => {
     if (!newItem.trim()) return;
@@ -50,61 +56,76 @@ export const CheckListView: React.FC<CheckListViewProps> = ({ note }) => {
     }
   };
 
-  if (error) {
-    return <div className={styles.error}>{error}</div>;
-  }
-
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.container}>
-        <div className={styles.addItemContainer}>
-          <input
+    <Box className={styles.pageWrapper}>
+      <Paper elevation={3} className={styles.container} sx={{ p: 2, mt: 2 }}>
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <Box className={styles.addItemContainer} sx={{ mb: 2, gap: 1 }}>
+          <TextField
             className={styles.addInput}
-            type="text"
+            variant="standard"
+            fullWidth
             placeholder="+ Add Task"
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleAdd();
             }}
+            InputProps={{ disableUnderline: true }}
+            sx={{ flex: 1, mr: 1 }}
           />
-          <Button className={styles.addButton} onClick={handleAdd}>
+          <Button
+            className={styles.addButton}
+            variant="contained"
+            color="primary"
+            onClick={handleAdd}
+            sx={{ minWidth: 80 }}
+          >
             Add
           </Button>
-        </div>
-        <ul className={styles.list}>
+        </Box>
+        <List className={styles.list}>
           {noteState.checkItems?.map((item) => (
-            <li
+            <ListItem
               key={item.id}
-              className={`${styles.listItem} ${
-                item.doneDate ? styles.listItemChecked : ""
-              }`}
+              className={styles.listItem}
+              sx={{
+                background: item.doneDate ? 'rgba(99,102,241,0.08)' : 'transparent',
+                borderBottom: '1px solid var(--border)',
+                py: 0.5,
+                px: 0,
+              }}
+              secondaryAction={
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(item.id)}>
+                  <DeleteIcon color="error" />
+                </IconButton>
+              }
+              disablePadding
             >
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={!!item.doneDate}
                 onChange={() => handleToggle(item.id)}
-                className={styles.checkbox}
+                sx={{ mr: 1 }}
+                color="primary"
               />
-              <input
-                type="text"
+              <TextField
                 value={item.name}
                 onChange={(e) => handleEdit(item.id, e.target.value)}
-                className={`${styles.itemInput} ${
-                  item.doneDate ? styles.itemInputChecked : ""
-                }`}
+                variant="standard"
+                fullWidth
+                InputProps={{
+                  disableUnderline: true,
+                  style: {
+                    textDecoration: item.doneDate ? 'line-through' : undefined,
+                    color: item.doneDate ? 'var(--color-text-secondary)' : 'var(--color-text)',
+                  },
+                }}
+                sx={{ flex: 1, background: 'transparent' }}
               />
-              <button
-                onClick={() => handleDelete(item.id)}
-                aria-label="Delete item"
-                className={styles.deleteButton}
-              >
-                ✕
-              </button>
-            </li>
+            </ListItem>
           ))}
-        </ul>
-      </div>
-    </div>
+        </List>
+      </Paper>
+    </Box>
   );
 };
