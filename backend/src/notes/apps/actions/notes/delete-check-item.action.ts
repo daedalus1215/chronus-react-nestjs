@@ -1,6 +1,6 @@
 import { Controller, Delete, Param, NotFoundException } from '@nestjs/common';
 import { ProtectedAction } from 'src/time-tracks/apps/decorators/protected-action.decorator';
-import { GetAuthUser } from 'src/auth/app/decorators/get-auth-user.decorator';
+import { AuthUser, GetAuthUser } from 'src/auth/app/decorators/get-auth-user.decorator';
 import { DeleteCheckItemTransactionScript } from 'src/notes/domain/transaction-scripts/delete-check-item.transaction.script';
 
 @Controller('notes')
@@ -18,7 +18,7 @@ export class DeleteCheckItemAction {
   })
   async apply(
     @Param('id') id: string,
-    @GetAuthUser() authUser: any
+    @GetAuthUser() authUser: AuthUser
   ): Promise<void> {
     await this.deleteCheckItemTS.apply(Number(id), authUser);
   }

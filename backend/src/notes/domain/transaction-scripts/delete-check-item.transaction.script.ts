@@ -12,6 +12,7 @@ export class DeleteCheckItemTransactionScript {
   ) {}
 
   async apply(id: number, authUser: AuthUser): Promise<void> {
+
     const checkItem = await this.checkItemRepository
       .createQueryBuilder('checkItem')
       .leftJoinAndSelect('checkItem.note', 'note')

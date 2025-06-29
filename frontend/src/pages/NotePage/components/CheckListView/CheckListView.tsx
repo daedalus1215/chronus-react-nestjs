@@ -12,6 +12,11 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import api from '../../../../api/axios.interceptor';
 
 type CheckListViewProps = {
   note: Note;
@@ -20,6 +25,10 @@ type CheckListViewProps = {
 export const CheckListView: React.FC<CheckListViewProps> = ({ note }) => {
   const [newItem, setNewItem] = useState("");
   const { noteState, error, addItem, toggleItem, deleteItem, updateItem } = useCheckItems(note);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleAdd = async () => {
     if (!newItem.trim()) return;
@@ -40,12 +49,46 @@ export const CheckListView: React.FC<CheckListViewProps> = ({ note }) => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDeleteClick = (id: number) => {
+    setDeleteTargetId(id);
+    setDeleteDialogOpen(true);
+    setDeleteError(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteTargetId == null) return;
+    setIsDeleting(true);
+    setDeleteError(null);
     try {
-      await deleteItem(id);
-    } catch (err) {
-      console.error("Failed to delete item:", err);
+      await deleteItem(deleteTargetId);
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
+    } catch (err: unknown) {
+      setIsDeleting(false);
+      let message = 'Failed to delete check item';
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data &&
+        typeof (err.response.data as { message?: unknown }).message === 'string'
+      ) {
+        message = (err.response.data as { message: string }).message;
+      }
+      setDeleteError(message);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteTargetId(null);
+    setDeleteError(null);
   };
 
   const handleEdit = async (id: number, name: string) => {
@@ -96,7 +139,7 @@ export const CheckListView: React.FC<CheckListViewProps> = ({ note }) => {
                 px: 0,
               }}
               secondaryAction={
-                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(item.id)}>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteClick(item.id)}>
                   <DeleteIcon color="error" />
                 </IconButton>
               }
@@ -126,6 +169,25 @@ export const CheckListView: React.FC<CheckListViewProps> = ({ note }) => {
           ))}
         </List>
       </Paper>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="delete-checkitem-dialog-title"
+      >
+        <DialogTitle id="delete-checkitem-dialog-title">Delete Check Item?</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this check item? This action cannot be undone.
+          {deleteError && <Alert severity="error" sx={{ mt: 2 }}>{deleteError}</Alert>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} disabled={isDeleting}>
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" variant="contained" disabled={isDeleting}>
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
