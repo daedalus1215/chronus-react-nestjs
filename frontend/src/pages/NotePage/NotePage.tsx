@@ -14,12 +14,12 @@ import { useAllTags } from './hooks/useAllTags';
 import { Chip, IconButton } from '@mui/material';
 import { Add, Close } from '@mui/icons-material';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { DesktopNoteEditor } from './components/NoteEditor/DesktopNoteEditor/DesktopNoteEditor';
-import { MobileNoteEditor } from './components/NoteEditor/MobileNoteEditor/MobileNoteEditor';
 import { DesktopCheckListView } from './components/CheckListView/DesktopCheckListView/DesktopCheckListView';
 import { MobileCheckListView } from './components/CheckListView/MobileCheckListView/MobileCheckListView';
 import { TranscriptionRecorder } from './components/TranscriptionRecorder/TranscriptionRecorder';
 import { useTranscriptionCallback } from './hooks/useTranscriptionCallback/useTranscriptionCallback';
+import { MemoList } from './components/MemoList/MemoList';
+import { AddMemoButton } from './components/AddMemoButton/AddMemoButton';
 import styles from './NotePage.module.css';
 
 export const NotePage: React.FC = () => {
@@ -153,32 +153,27 @@ export const NotePage: React.FC = () => {
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
+            overflowY: 'auto',
           }}
         >
-          {note?.isMemo ? (
+          <TranscriptionRecorder
+            noteId={note.id}
+            onTranscription={onTranscriptionCallback}
+          />
+          <AddMemoButton noteId={note.id} />
+          <MemoList
+            memos={note.memos || []}
+            noteId={note.id}
+            onAppendToDescription={setAppendToDescriptionFn}
+          />
+          {note.checkItems && note.checkItems.length > 0 && (
             <>
-              <TranscriptionRecorder
-                noteId={note.id}
-                onTranscription={onTranscriptionCallback}
-              />
               {isMobile ? (
-                <MobileNoteEditor
-                  note={note}
-                  onSave={handleSave}
-                  onAppendToDescription={setAppendToDescriptionFn}
-                />
+                <MobileCheckListView note={note} />
               ) : (
-                <DesktopNoteEditor
-                  note={note}
-                  onSave={handleSave}
-                  onAppendToDescription={setAppendToDescriptionFn}
-                />
+                <DesktopCheckListView note={note} />
               )}
             </>
-          ) : isMobile ? (
-            <MobileCheckListView note={note} />
-          ) : (
-            <DesktopCheckListView note={note} />
           )}
         </Box>
       </Box>

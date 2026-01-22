@@ -1,7 +1,13 @@
 import api from '../axios.interceptor';
 
-export const convertTextToSpeech = async (assetId: number) => {
-  const response = await api.post(`/audio/text-to-speech`, { assetId });
+export const convertTextToSpeech = async (
+  noteId: number,
+  memoId?: number
+) => {
+  const response = await api.post(`/audio/text-to-speech`, {
+    noteId,
+    memoId,
+  });
   return response.data;
 };
 

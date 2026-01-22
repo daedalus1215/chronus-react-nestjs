@@ -31,10 +31,9 @@ export const useUpdateNoteMutation = (noteId: number) => {
 
   return useMutation({
     mutationFn: async (updatedNote: Partial<Note>) => {
-      const { name, description, tags } = updatedNote;
+      const { name, tags } = updatedNote;
       const response = await api.patch<Note>(`/notes/detail/${noteId}`, {
         name,
-        description,
         tags,
       });
       return response.data;

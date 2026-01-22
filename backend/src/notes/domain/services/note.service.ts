@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Note } from '../entities/notes/note.entity';
+import { Memo } from '../entities/notes/memo.entity';
 import { ArchiveNoteTransactionScript } from '../transaction-scripts/archive-note/archive-note.transaction.script';
 import { GetNoteByIdTransactionScript } from '../transaction-scripts/get-note-by-id.transaction.script';
 import { UpdateNoteTransactionScript } from '../transaction-scripts/update-note-TS/update-note.transaction.script';
@@ -14,7 +15,8 @@ import { CheckItemProjection } from 'src/check-items/domain/aggregators/check-it
 
 export type NoteWithCheckItems = {
   note: Note;
-  checkItems: CheckItemProjection[];
+  checkItems?: CheckItemProjection[];
+  memos?: Memo[];
 };
 
 @Injectable()
@@ -26,7 +28,7 @@ export class NoteService {
     private readonly eventEmitter: EventEmitter2,
     private readonly noteRepository: NoteMemoTagRepository,
     private readonly checkItemsAggregator: CheckItemsAggregator
-  ) {}
+  ) { }
 
   async archiveNote(noteId: number, authUser: AuthUser): Promise<Note> {
     return await this.archiveNoteTransactionScript.apply(
@@ -44,9 +46,11 @@ export class NoteService {
       noteId,
       userId
     );
+    const memos = note.memos || [];
     return {
       note,
       checkItems,
+      memos,
     };
   }
 

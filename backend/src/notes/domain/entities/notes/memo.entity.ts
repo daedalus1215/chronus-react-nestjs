@@ -1,7 +1,8 @@
 import {
   Entity,
   Column,
-  OneToOne,
+  ManyToOne,
+  JoinColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
@@ -22,6 +23,10 @@ export class Memo {
   @Column({ name: 'description', type: 'text', default: '' })
   description: string;
 
-  @OneToOne(() => Note, note => note.id, { onDelete: 'CASCADE' })
+  @Column({ name: 'note_id' })
+  noteId: number;
+
+  @ManyToOne(() => Note, note => note.memos, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'note_id' })
   note: Note;
 }

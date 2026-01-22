@@ -4,14 +4,14 @@ import { NoteWithCheckItems } from '../../../../domain/services/note.service';
 
 @Injectable()
 export class UpdateNoteResponder {
+
   apply(input: NoteWithCheckItems): NoteResponseDto {
-    const { note, checkItems } = input;
+    const { note, checkItems, memos } = input;
     return {
-      ...input,
       id: note.id,
       name: note.name,
       checkItems,
-      isMemo: note.memo !== null,
+      memos,
     };
   }
 }

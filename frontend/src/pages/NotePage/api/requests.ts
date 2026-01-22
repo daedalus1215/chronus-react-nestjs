@@ -7,12 +7,12 @@ export const fetchNoteById = async (id: number): Promise<Note> => {
     response.data ?? {
       id: 0,
       name: '',
-      description: '',
       userId: '',
-      isMemo: false,
       createdAt: '',
       updatedAt: '',
-      archivedDate: null,
+      tags: [],
+      checkItems: [],
+      memos: [],
     }
   );
 };

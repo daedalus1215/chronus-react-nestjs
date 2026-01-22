@@ -4,7 +4,10 @@ import {
   downloadAudio,
 } from '../../../../api/requests/audio.requests';
 
-export const useAudioActions = (assetId: number) => {
+export const useAudioActions = (
+  noteId: number,
+  memoId?: number
+) => {
   const [isConverting, setIsConverting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +16,7 @@ export const useAudioActions = (assetId: number) => {
     try {
       setIsConverting(true);
       setError(null);
-      await convertTextToSpeech(assetId);
+      await convertTextToSpeech(noteId, memoId);
     } catch (err) {
       setError('Failed to convert text to speech');
       console.error('Error converting text to speech:', err);
@@ -56,6 +59,6 @@ export const useAudioActions = (assetId: number) => {
     isConverting,
     isDownloading,
     error,
-    assetId,
+    noteId,
   };
 };

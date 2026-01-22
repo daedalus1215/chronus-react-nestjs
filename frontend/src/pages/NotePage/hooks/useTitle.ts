@@ -4,9 +4,7 @@ import api from '../../../api/axios.interceptor';
 export type Note = {
   id: number;
   name: string;
-  description?: string;
   userId: string;
-  isMemo: boolean;
   createdAt?: string;
 };
 

@@ -60,7 +60,7 @@ export class HermesRemoteCaller {
       const requestBody = {
         text: sanitizedText,
         userId: request.userId.toString(),
-        assetId: request.assetId.toString(),
+        assetId: request.noteId.toString(),
       };
       this.logger.debug('Request body:', requestBody);
 

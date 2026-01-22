@@ -1,10 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class TextToSpeechRequestDto {
-  @ApiProperty({ description: 'ID of the asset associated with the audio' })
+  @ApiProperty({ description: 'ID of the note' })
   @IsNumber()
-  assetId: number;
+  noteId: number;
+
+  @ApiProperty({
+    description: 'ID of the memo to convert to speech. Required if note has multiple memos.',
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  memoId?: number;
 }
 
 export class TextToSpeechResponseDto {

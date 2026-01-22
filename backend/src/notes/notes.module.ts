@@ -27,6 +27,18 @@ import { GetNoteDetailsListener } from './apps/listeners/get-note-details.listen
 import { CheckItemsModule } from '../check-items/check-items.module';
 import { GetNoteByIdResponder } from './apps/actions/notes/get-note-by-id-action/get-note-by-id.responder';
 import { UpdateNoteResponder } from './apps/actions/notes/update-note-action/update-note.responder';
+import { MemoRepository } from './infra/repositories/memo.repository';
+import { CreateMemoTransactionScript } from './domain/transaction-scripts/create-memo-TS/create-memo.transaction.script';
+import { UpdateMemoTransactionScript } from './domain/transaction-scripts/update-memo-TS/update-memo.transaction.script';
+import { DeleteMemoTransactionScript } from './domain/transaction-scripts/delete-memo-TS/delete-memo.transaction.script';
+import { GetMemosByNoteIdTransactionScript } from './domain/transaction-scripts/get-memos-by-note-id-TS/get-memos-by-note-id.transaction.script';
+import { CreateMemoAction } from './apps/actions/memos/create-memo-action/create-memo.action';
+import { UpdateMemoAction } from './apps/actions/memos/update-memo-action/update-memo.action';
+import { DeleteMemoAction } from './apps/actions/memos/delete-memo-action/delete-memo.action';
+import { GetMemosByNoteIdAction } from './apps/actions/memos/get-memos-by-note-id-action/get-memos-by-note-id.action';
+import { CreateMemoResponder } from './apps/actions/memos/create-memo-action/create-memo.responder';
+import { UpdateMemoResponder } from './apps/actions/memos/update-memo-action/update-memo.responder';
+import { GetMemosByNoteIdResponder } from './apps/actions/memos/get-memos-by-note-id-action/get-memo-by-note-id.responder';
 
 @Module({
   imports: [
@@ -37,6 +49,7 @@ import { UpdateNoteResponder } from './apps/actions/notes/update-note-action/upd
   ],
   providers: [
     NoteMemoTagRepository,
+    MemoRepository,
     NoteAggregator,
     CreateNoteTransactionScript,
     GetNoteByIdTransactionScript,
@@ -50,6 +63,13 @@ import { UpdateNoteResponder } from './apps/actions/notes/update-note-action/upd
     GetNoteDetailsListener,
     GetNoteByIdResponder,
     UpdateNoteResponder,
+    CreateMemoResponder,
+    UpdateMemoResponder,
+    GetMemosByNoteIdResponder,
+    CreateMemoTransactionScript,
+    UpdateMemoTransactionScript,
+    DeleteMemoTransactionScript,
+    GetMemosByNoteIdTransactionScript,
   ],
   controllers: [
     GetNoteNamesByUserIdAction,
@@ -60,6 +80,10 @@ import { UpdateNoteResponder } from './apps/actions/notes/update-note-action/upd
     UpdateNoteTitleAction,
     DeleteNoteAction,
     ArchiveNoteAction,
+    CreateMemoAction,
+    UpdateMemoAction,
+    DeleteMemoAction,
+    GetMemosByNoteIdAction,
   ],
   exports: [NoteMemoTagRepository, NoteAggregator, NoteService],
 })

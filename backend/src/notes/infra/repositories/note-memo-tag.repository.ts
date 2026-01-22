@@ -16,11 +16,7 @@ export class NoteMemoTagRepository {
   async findById(id: number, userId: number): Promise<Note | null> {
     return this.repository
       .createQueryBuilder('note')
-      .addSelect(
-        'CASE WHEN note.memo_id IS NOT NULL THEN 1 ELSE 0 END',
-        'isMemo'
-      )
-      .leftJoinAndSelect('note.memo', 'memo')
+      .leftJoinAndSelect('note.memos', 'memos')
       .where('note.id = :id', { id })
       .andWhere('note.user_id = :userId', { userId })
       .getOne();
@@ -29,17 +25,20 @@ export class NoteMemoTagRepository {
   async findMemoById(id: number, userId: number): Promise<Note | null> {
     return this.repository
       .createQueryBuilder('note')
-      .addSelect('1', 'isMemo')
-      .leftJoinAndSelect('note.memo', 'memo')
+      .leftJoinAndSelect('note.memos', 'memos')
       .where('note.id = :id', { id })
       .andWhere('note.user_id = :userId', { userId })
-      .andWhere('note.memo_id IS NOT NULL')
+      .andWhere(
+        'EXISTS (SELECT 1 FROM memos WHERE memos.note_id = note.id)'
+      )
       .getOne();
   }
 
   async save(note: Note): Promise<Note> {
-    if (note.memo) {
-      note.memo = await this.memoRepository.save(note.memo);
+    if (note.memos && note.memos.length > 0) {
+      for (const memo of note.memos) {
+        await this.memoRepository.save(memo);
+      }
     }
     return this.repository.save(note);
   }
@@ -57,7 +56,7 @@ export class NoteMemoTagRepository {
       .select('note.name', 'name')
       .addSelect('note.id', 'id')
       .addSelect(
-        'CASE WHEN note.memo_id IS NOT NULL THEN 1 ELSE 0 END',
+        'CASE WHEN EXISTS (SELECT 1 FROM memos WHERE memos.note_id = note.id) THEN 1 ELSE 0 END',
         'isMemo'
       )
       .where('note.user_id = :userId', { userId });
@@ -69,9 +68,13 @@ export class NoteMemoTagRepository {
     }
 
     if (type === 'memo') {
-      qb.andWhere('note.memo_id IS NOT NULL');
+      qb.andWhere(
+        'EXISTS (SELECT 1 FROM memos WHERE memos.note_id = note.id)'
+      );
     } else if (type === 'checklist') {
-      qb.andWhere('note.memo_id IS NULL');
+      qb.andWhere(
+        'NOT EXISTS (SELECT 1 FROM memos WHERE memos.note_id = note.id)'
+      );
     }
 
     if (tagId) {

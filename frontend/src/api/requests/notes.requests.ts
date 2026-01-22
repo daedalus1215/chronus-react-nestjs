@@ -21,7 +21,6 @@ export const createNote = async (
 ): Promise<NoteResponse> => {
   const response = await api.post<NoteResponse>('/notes', {
     name: type === NOTE_TYPES.MEMO ? 'Memo' : 'Checklist',
-    isMemo: type === NOTE_TYPES.MEMO,
   });
   return response.data;
 };

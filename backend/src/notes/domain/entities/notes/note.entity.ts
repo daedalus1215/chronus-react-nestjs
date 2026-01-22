@@ -1,8 +1,7 @@
 import {
   Entity,
   Column,
-  JoinColumn,
-  OneToOne,
+  OneToMany,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
   CreateDateColumn,
@@ -25,13 +24,10 @@ export class Note {
   @UpdateDateColumn({ name: 'updated_at', type: 'text' })
   updatedAt: string;
 
-  @OneToOne(() => Memo, memo => memo.id, {
+  @OneToMany(() => Memo, memo => memo.note, {
     cascade: true,
-    nullable: true,
-    onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'memo_id' })
-  memo: Memo | null;
+  memos?: Memo[] | null;
 
   @Column()
   name: string;

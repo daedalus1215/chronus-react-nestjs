@@ -26,7 +26,6 @@ export class UpdateNoteTransactionScript {
     // Convert DTO to Params (domain layer boundary)
     const updateNoteParams: UpdateNoteParams = {
       name: updateNoteDto.name,
-      description: updateNoteDto.description,
       tags: updateNoteDto.tags,
     };
 

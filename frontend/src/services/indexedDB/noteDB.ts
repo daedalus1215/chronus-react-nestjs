@@ -4,8 +4,6 @@ export type Note = {
   id: number;
   name: string;
   userId: string;
-  isMemo: boolean;
-  content?: string;
   createdAt: string;
   updatedAt: string;
 };

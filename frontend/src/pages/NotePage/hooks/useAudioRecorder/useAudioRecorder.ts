@@ -43,27 +43,32 @@ export const useAudioRecorder = ({
         };
       }
 
+      // Check if devices exist (may not show labels without permission, but we can still check)
       const devices = await navigator.mediaDevices.enumerateDevices();
       const audioInputs = devices.filter(
         device => device.kind === 'audioinput'
       );
 
-      if (audioInputs.length === 0) {
-        return {
-          available: false,
-          error: 'No audio input devices found',
-        };
+      // If we have devices with labels, we have permission and devices exist
+      const hasLabeledDevices = audioInputs.some(device => device.label.length > 0);
+      if (hasLabeledDevices) {
+        return { available: true };
       }
 
+      // If we have devices but no labels, permission hasn't been granted yet
+      // But devices exist, so it's available (just needs permission)
+      if (audioInputs.length > 0) {
+        return { available: true };
+      }
+
+      // No devices found - might be because permission wasn't granted
+      // Return available: true anyway and let the actual recording request handle it
+      // This way users can still try to record and get the permission prompt
       return { available: true };
     } catch (err) {
-      return {
-        available: false,
-        error:
-          err instanceof Error
-            ? err.message
-            : 'Unknown error checking microphone',
-      };
+      // On error, assume available and let the actual recording handle the error
+      // This prevents false negatives when permission hasn't been granted yet
+      return { available: true };
     }
   }, []);
 

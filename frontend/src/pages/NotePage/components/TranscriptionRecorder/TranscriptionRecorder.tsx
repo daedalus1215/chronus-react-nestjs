@@ -86,8 +86,8 @@ export const TranscriptionRecorder: React.FC<TranscriptionRecorderProps> = ({
     const checkMic = async () => {
       const result = await checkMicrophoneAvailability();
       setMicAvailable(result.available);
-      if (!result.available) {
-        setSnackbarMessage('Microphone not available');
+      if (!result.available && result.error) {
+        setSnackbarMessage(result.error);
         setSnackbarSeverity('warning');
         setSnackbarOpen(true);
       }

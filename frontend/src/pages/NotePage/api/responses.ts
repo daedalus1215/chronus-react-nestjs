@@ -1,9 +1,7 @@
 export type Note = {
   id: number;
   name: string;
-  description?: string;
   userId: string;
-  isMemo: boolean;
   createdAt: string;
   updatedAt: string;
   tags: Array<{
@@ -11,6 +9,15 @@ export type Note = {
     name: string;
   }>;
   checkItems?: Array<CheckItem>;
+  memos: Array<Memo>;
+};
+
+export type Memo = {
+  id: number;
+  description: string;
+  noteId: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type CheckItem = {

@@ -27,7 +27,7 @@ type NoteActionsProps = {
   onDuplicate: () => void;
   onPin: () => void;
   onArchive: () => void;
-  onTextToSpeech: () => void;
+  onTextToSpeech?: () => void;
   onStar: () => void;
   onExport: () => void;
   onLock: () => void;
@@ -73,14 +73,16 @@ export const NoteActionsGrid: React.FC<NoteActionsProps> = ({
           <EditOutlined className={styles.icon} />
         </ActionButton>
 
-        <ActionButton
-          label="To Speech"
-          onClick={onTextToSpeech}
-          disabled={isConverting || isDownloading}
-        >
-          <RecordVoiceOverOutlined className={styles.icon} />
-          {isConverting ? 'Converting...' : ''}
-        </ActionButton>
+        {onTextToSpeech && (
+          <ActionButton
+            label="To Speech"
+            onClick={onTextToSpeech}
+            disabled={isConverting || isDownloading}
+          >
+            <RecordVoiceOverOutlined className={styles.icon} />
+            {isConverting ? 'Converting...' : ''}
+          </ActionButton>
+        )}
 
         <ActionButton
           label="Download"

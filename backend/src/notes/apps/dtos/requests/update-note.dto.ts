@@ -8,11 +8,9 @@ export class UpdateNoteDto {
   @IsOptional()
   name?: string;
 
-  @ApiProperty({ description: 'The content of the note', required: false })
-  @IsString()
-  @IsOptional()
-  description?: string;
-
   @IsOptional()
   tags?: { id: string; name: string; description: string }[];
+
+  @IsOptional()
+  memos?: { id: string; description: string }[];
 }

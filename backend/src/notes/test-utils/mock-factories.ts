@@ -23,7 +23,17 @@ export const createMockNote = (overrides: Partial<Note> = {}): Note => ({
   name: 'Original Note',
   userId: 1,
   archivedAt: null,
-  memo: null,
+  memos: [createMockMemo()],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  ...overrides,
+});
+
+export const createMockMemo = (overrides: Partial<Memo> = {}): Memo => ({
+  id: 1,
+  description: 'Original Description',
+  noteId: 1,
+  note: createMockNote(),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   ...overrides,
@@ -33,7 +43,7 @@ export const createMockUpdateNoteDto = (
   overrides: Partial<UpdateNoteDto> = {}
 ): UpdateNoteDto => ({
   name: 'Updated Note',
-  description: 'Updated Description',
+  memos: [{ id: '1', description: 'Updated Description' }],
   tags: [],
   ...overrides,
 });

@@ -64,7 +64,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
     isConverting,
     isDownloading,
     error: audioError,
-  } = useAudioActions(note.id);
+  } = useAudioActions(note.id, undefined); // memoId will be determined by backend if note has only one memo
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -228,9 +228,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
       >
         <div className={styles.noteInfo}>
           <span className={styles.noteName}>{note.name}</span>
-          <span className={styles.noteType}>
-            {note.isMemo ? 'Memo' : 'List'}
-          </span>
+          <span className={styles.noteType}>Note</span>
         </div>
         <button
           className={styles.moreButton}
@@ -252,7 +250,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
         onViewTimeEntries={handleViewTimeEntries}
         onPin={handleTimeTracking}
         onStar={handleTimeTracking}
-        onTextToSpeech={handleTextToSpeech}
+        onTextToSpeech={note.isMemo ? handleTextToSpeech : undefined}
         onDownloadAudio={handleDownloadAudio}
         onEdit={handleTimeTracking}
         onLabel={handleTimeTracking}
