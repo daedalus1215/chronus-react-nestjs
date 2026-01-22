@@ -43,8 +43,11 @@ export const NotePage: React.FC = () => {
   const [isAddTagOpen, setAddTagOpen] = useState(false);
 
   // Use custom hook to manage transcription callback chain
-  const { setAppendToDescriptionFn, onTranscription: onTranscriptionCallback } =
-    useTranscriptionCallback();
+  const {
+    setAppendToDescriptionFn,
+    setFocusedMemo,
+    onTranscription: onTranscriptionCallback,
+  } = useTranscriptionCallback();
 
   if (isLoading) {
     return (
@@ -165,6 +168,7 @@ export const NotePage: React.FC = () => {
             memos={note.memos || []}
             noteId={note.id}
             onAppendToDescription={setAppendToDescriptionFn}
+            setFocusedMemo={setFocusedMemo}
           />
           {note.checkItems && note.checkItems.length > 0 && (
             <>

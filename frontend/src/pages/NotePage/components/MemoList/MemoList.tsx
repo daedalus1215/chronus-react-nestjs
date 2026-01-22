@@ -7,24 +7,24 @@ import { useIsMobile } from '../../../../hooks/useIsMobile';
 type MemoListProps = {
   memos: Memo[];
   noteId: number;
-  onAppendToDescription?: (appendFn: (text: string) => void) => void;
+  onAppendToDescription?: (
+    appendFn: (text: string) => void | null,
+    memoId?: number
+  ) => void;
+  setFocusedMemo?: (memoId: number | null) => void;
 };
 
 export const MemoList: React.FC<MemoListProps> = ({
   memos,
   noteId,
   onAppendToDescription,
+  setFocusedMemo,
 }) => {
   const isMobile = useIsMobile();
 
   if (memos.length === 0) {
     return null;
   }
-
-  // Only pass onAppendToDescription to the first memo
-  // This ensures transcriptions go to the first memo
-  const firstMemo = memos[0];
-  const otherMemos = memos.slice(1);
 
   return (
     <Box
@@ -35,17 +35,13 @@ export const MemoList: React.FC<MemoListProps> = ({
         mb: 2,
       }}
     >
-      <MemoSection
-        key={firstMemo.id}
-        memo={firstMemo}
-        noteId={noteId}
-        onAppendToDescription={onAppendToDescription}
-      />
-      {otherMemos.map(memo => (
+      {memos.map(memo => (
         <MemoSection
           key={memo.id}
           memo={memo}
           noteId={noteId}
+          onAppendToDescription={onAppendToDescription}
+          setFocusedMemo={setFocusedMemo}
         />
       ))}
     </Box>

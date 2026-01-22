@@ -12,13 +12,18 @@ import { convertTextToSpeech } from '../../../../api/requests/audio.requests';
 type MemoSectionProps = {
   memo: Memo;
   noteId: number;
-  onAppendToDescription?: (appendFn: (text: string) => void) => void;
+  onAppendToDescription?: (
+    appendFn: (text: string) => void | null,
+    memoId?: number
+  ) => void;
+  setFocusedMemo?: (memoId: number | null) => void;
 };
 
 export const MemoSection: React.FC<MemoSectionProps> = ({
   memo,
   noteId,
   onAppendToDescription,
+  setFocusedMemo,
 }) => {
   const isMobile = useIsMobile();
   const { updateMemo, deleteMemo, isUpdating, isDeleting } = useMemos(noteId);
@@ -80,11 +85,33 @@ export const MemoSection: React.FC<MemoSectionProps> = ({
     [description, memo.id, updateMemo]
   );
 
+  const handleFocus = React.useCallback(() => {
+    // When this memo's textarea gets focus, register it as the active memo
+    if (setFocusedMemo) {
+      setFocusedMemo(memo.id);
+    }
+  }, [memo.id, setFocusedMemo]);
+
+  const handleBlur = React.useCallback(() => {
+    // Optionally clear focus when blurring, or keep the last focused memo
+    // For now, we'll keep the last focused memo so transcriptions continue to go there
+  }, []);
+
   React.useEffect(() => {
     if (onAppendToDescription) {
-      onAppendToDescription(appendToDescription);
+      // Register this memo's append function
+      if (typeof onAppendToDescription === 'function') {
+        onAppendToDescription(appendToDescription, memo.id);
+      }
     }
-  }, [onAppendToDescription, appendToDescription]);
+    
+    return () => {
+      // Unregister when component unmounts
+      if (onAppendToDescription && typeof onAppendToDescription === 'function') {
+        onAppendToDescription(null, memo.id);
+      }
+    };
+  }, [onAppendToDescription, appendToDescription, memo.id]);
 
   React.useEffect(() => {
     return () => {
@@ -142,6 +169,8 @@ export const MemoSection: React.FC<MemoSectionProps> = ({
         id={`memo-description-${memo.id}`}
         value={description}
         onChange={handleDescriptionChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         multiline
         fullWidth
         placeholder="Start typing your memo..."
