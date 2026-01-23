@@ -27,9 +27,16 @@ export const MemoSection: React.FC<MemoSectionProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const { updateMemo, deleteMemo, isUpdating, isDeleting } = useMemos(noteId);
-  const [description, setDescription] = useState(memo.description);
+  const [description, setDescription] = useState(memo?.description || '');
   const [isConverting, setIsConverting] = useState(false);
   const timeoutRef = React.useRef<number>();
+
+  // Sync local state with memo prop when it changes
+  React.useEffect(() => {
+    if (memo && memo.description !== undefined) {
+      setDescription(memo.description);
+    }
+  }, [memo?.id, memo?.description]);
 
   const handleDescriptionChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>

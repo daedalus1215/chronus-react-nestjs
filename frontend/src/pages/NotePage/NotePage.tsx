@@ -16,10 +16,9 @@ import { Add, Close } from '@mui/icons-material';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { DesktopCheckListView } from './components/CheckListView/DesktopCheckListView/DesktopCheckListView';
 import { MobileCheckListView } from './components/CheckListView/MobileCheckListView/MobileCheckListView';
-import { TranscriptionRecorder } from './components/TranscriptionRecorder/TranscriptionRecorder';
 import { useTranscriptionCallback } from './hooks/useTranscriptionCallback/useTranscriptionCallback';
 import { MemoList } from './components/MemoList/MemoList';
-import { AddMemoButton } from './components/AddMemoButton/AddMemoButton';
+import { NoteActionsFab } from './components/NoteActionsFab/NoteActionsFab';
 import styles from './NotePage.module.css';
 
 export const NotePage: React.FC = () => {
@@ -33,6 +32,7 @@ export const NotePage: React.FC = () => {
     loading: titleLoading,
     error: titleError,
   } = useTitle(note);
+
   const { tags, refetch, removeTagFromNote } = useNoteTags(Number(id));
 
   const {
@@ -66,13 +66,15 @@ export const NotePage: React.FC = () => {
     }
   };
 
-  const availableTags = allTags
+  const availableTags: Tag[] = allTags
     ? allTags.filter(
         (tag: { id: number }) =>
           !tags.some((noteTag: { id: number }) => noteTag.id === tag.id)
       )
-    : [];
+    : [{ id: 1, name: 'Loading...' }];
 
+
+    console.log('note', note);
   return (
     <main className={styles.main}>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -159,17 +161,14 @@ export const NotePage: React.FC = () => {
             overflowY: 'auto',
           }}
         >
-          <TranscriptionRecorder
-            noteId={note.id}
-            onTranscription={onTranscriptionCallback}
-          />
-          <AddMemoButton noteId={note.id} />
           <MemoList
             memos={note.memos || []}
             noteId={note.id}
             onAppendToDescription={setAppendToDescriptionFn}
             setFocusedMemo={setFocusedMemo}
           />
+          {/* Debug: Log memos to verify they have descriptions */}
+          {console.log('NotePage: memos being passed to MemoList', note.memos)}
           {note.checkItems && note.checkItems.length > 0 && (
             <>
               {isMobile ? (
@@ -181,6 +180,10 @@ export const NotePage: React.FC = () => {
           )}
         </Box>
       </Box>
+      <NoteActionsFab
+        note={note}
+        onTranscription={onTranscriptionCallback}
+      />
     </main>
-  );
+  );  
 };

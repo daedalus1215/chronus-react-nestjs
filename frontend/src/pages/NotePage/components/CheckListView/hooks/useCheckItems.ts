@@ -11,7 +11,10 @@ export const checkItemKeys = {
 };
 
 // Add a query hook for fetching check items
-export const useCheckItemsQuery = (noteId: number) => {
+export const useCheckItemsQuery = (
+  noteId: number,
+  enabled: boolean = true
+) => {
   return useQuery({
     queryKey: checkItemKeys.list(noteId),
     queryFn: async () => {
@@ -20,7 +23,7 @@ export const useCheckItemsQuery = (noteId: number) => {
       );
       return response.data;
     },
-    enabled: !!noteId,
+    enabled: !!noteId && enabled,
   });
 };
 
@@ -45,10 +48,13 @@ type UseCheckListReturn = {
   reorderError: string | null;
 };
 
-export const useCheckItems = (note: Note): UseCheckListReturn => {
+export const useCheckItems = (
+  note: Note,
+  enabled: boolean = true
+): UseCheckListReturn => {
   const queryClient = useQueryClient();
 
-  const { data: checkItems = [] } = useCheckItemsQuery(note.id);
+  const { data: checkItems = [] } = useCheckItemsQuery(note.id, enabled);
   const noteState = { ...note, checkItems };
 
   const addItemMutation = useMutation({

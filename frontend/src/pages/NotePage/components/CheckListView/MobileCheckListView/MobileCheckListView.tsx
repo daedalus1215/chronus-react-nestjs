@@ -10,13 +10,9 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import { useCheckItemsQuery } from '../hooks/useCheckItems';
-import { Fab } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
 import styles from './MobileCheckListView.module.css';
 import { useCheckItemEditDialog } from '../hooks/useCheckItemEditDialog';
 import { EditCheckItemDialog } from '../components/EditCheckItemDialog/EditCheckItemDialog';
-import { useAddCheckItemDialog } from '../hooks/useAddCheckItemDialog';
-import { AddCheckItemDialog } from '../components/AddCheckItemDialog/AddCheckItemDialog';
 import { useDeleteCheckItemDialog } from '../hooks/useDeleteCheckItemDialog';
 import { DeleteCheckItemDialog } from '../components/DeleteCheckItemDialog/DeleteCheckItemDialog';
 import { DraggableCheckItemList } from '../components/DraggableCheckItemList/DraggableCheckItemList';
@@ -27,17 +23,10 @@ type CheckListViewProps = {
 };
 
 export const MobileCheckListView: React.FC<CheckListViewProps> = ({ note }) => {
-  const { data: checkItems = [], error } = useCheckItemsQuery(note.id);
-  const { addItem, toggleItem, deleteItem, updateItem, reorderItems } =
-    useCheckItems(note);
-  const {
-    isOpen: isAddDialogOpen,
-    value: newItemValue,
-    openDialog: openAddDialog,
-    closeDialog: closeAddDialog,
-    changeValue: changeNewItemValue,
-    saveNew,
-  } = useAddCheckItemDialog();
+  // Note: These views are only rendered when note has checkItems, so query is always enabled
+  const { data: checkItems = [], error } = useCheckItemsQuery(note.id, true);
+  const { toggleItem, deleteItem, updateItem, reorderItems } =
+    useCheckItems(note, true);
   const {
     isOpen: isEditDialogOpen,
     editItemValue,
@@ -55,14 +44,6 @@ export const MobileCheckListView: React.FC<CheckListViewProps> = ({ note }) => {
     confirmDelete,
   } = useDeleteCheckItemDialog();
 
-  const handleAdd = async () => {
-    try {
-      await addItem(newItemValue.trim());
-    } catch (err) {
-      // You might want to show an error toast here
-      console.error('Failed to add item:', err);
-    }
-  };
 
   const handleToggle = async (id: number) => {
     try {
@@ -103,13 +84,6 @@ export const MobileCheckListView: React.FC<CheckListViewProps> = ({ note }) => {
     }
   };
 
-  const handleCreateNote = async () => {
-    try {
-      await saveNew(handleAdd);
-    } catch (err) {
-      console.error('Failed to create check item:', err);
-    }
-  };
 
   const handleReorder = async (checkItemIds: number[]) => {
     try {
@@ -126,16 +100,6 @@ export const MobileCheckListView: React.FC<CheckListViewProps> = ({ note }) => {
           <Alert severity="error" sx={{ mb: 2 }}>
             {error.message}
           </Alert>
-        )}
-
-        {isAddDialogOpen && (
-          <AddCheckItemDialog
-            isOpen={isAddDialogOpen}
-            value={newItemValue}
-            onChange={changeNewItemValue}
-            onSave={handleCreateNote}
-            onClose={closeAddDialog}
-          />
         )}
         {isEditDialogOpen && (
           <EditCheckItemDialog
@@ -267,19 +231,6 @@ export const MobileCheckListView: React.FC<CheckListViewProps> = ({ note }) => {
         onCancel={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
       />
-      <Fab
-        color="primary"
-        aria-label="Create new note"
-        onClick={openAddDialog}
-        // disabled={isCreating}
-        sx={{
-          position: 'fixed',
-          bottom: '2rem',
-          right: '2rem',
-        }}
-      >
-        <AddIcon />
-      </Fab>
     </Box>
   );
 };

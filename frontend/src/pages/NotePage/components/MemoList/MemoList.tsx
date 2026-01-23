@@ -22,7 +22,7 @@ export const MemoList: React.FC<MemoListProps> = ({
 }) => {
   const isMobile = useIsMobile();
 
-  if (memos.length === 0) {
+  if (!memos || memos.length === 0) {
     return null;
   }
 
