@@ -8,6 +8,7 @@ export type CheckItemProjection = {
   doneDate: Date | null;
   archiveDate: Date | null;
   noteId: number;
+  checklistId: number | null;
   order: number;
   createdAt: Date;
   updatedAt: Date;
@@ -51,6 +52,7 @@ export class CheckItemsAggregator {
       doneDate: item.doneDate,
       archiveDate: item.archiveDate,
       noteId: item.noteId,
+      checklistId: item.checklistId,
       order: item.order,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,

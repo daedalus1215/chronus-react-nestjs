@@ -40,6 +40,7 @@ export class CheckItemService {
     return this.createCheckItemTransactionScript.apply({
       name: dto.checkItem.name,
       noteId: dto.noteId,
+      checklistId: dto.checkItem.checklistId,
     });
   }
 

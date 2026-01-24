@@ -2,10 +2,12 @@ import {
   Entity,
   Column,
   JoinColumn,
+  ManyToOne,
   UpdateDateColumn,
   CreateDateColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Checklist } from './checklist.entity';
 
 @Entity('check_items')
 export class CheckItem {
@@ -30,6 +32,15 @@ export class CheckItem {
   @Column({ name: 'note_id' })
   @JoinColumn({ name: 'note_id' })
   noteId: number;
+
+  @Column({ name: 'checklist_id', nullable: true })
+  checklistId: number | null;
+
+  @ManyToOne(() => Checklist, checklist => checklist.checkItems, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'checklist_id' })
+  checklist: Checklist | null;
 
   @Column({ name: 'order', type: 'integer', default: 0 })
   order: number;
