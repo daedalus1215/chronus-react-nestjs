@@ -7,10 +7,10 @@ export class UpdateNoteResponder {
   apply(input: NoteWithCheckItems): NoteResponseDto {
     const { note, checkItems } = input;
     return {
-      ...input,
       id: note.id,
       name: note.name,
       checkItems,
+      description: note.memo?.description || '',
       isMemo: note.memo !== null,
     };
   }

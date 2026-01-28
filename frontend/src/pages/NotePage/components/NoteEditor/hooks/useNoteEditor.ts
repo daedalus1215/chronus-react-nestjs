@@ -38,18 +38,61 @@ export const useNoteEditor = ({
   });
   const timeoutRef = React.useRef<number>();
   const contentRef = React.useRef(content);
+  const lastSyncedNoteDescriptionRef = React.useRef<string>(note.description || '');
+  const noteIdRef = React.useRef<number>(note.id);
+  const isInitialMountRef = React.useRef<boolean>(true);
 
   // Update contentRef when content changes
   React.useEffect(() => {
     contentRef.current = content;
   }, [content]);
 
+  // Sync local state with note prop when note changes (e.g., after save or when switching modes)
+  React.useEffect(() => {
+    const currentNoteDescription = note.description || '';
+    const lastSynced = lastSyncedNoteDescriptionRef.current;
+    const localDescription = contentRef.current.description;
+    const previousNoteId = noteIdRef.current;
+    
+    // If note ID changed, we're editing a different note - reset everything
+    if (note.id !== previousNoteId) {
+      setContent({ description: currentNoteDescription });
+      lastSyncedNoteDescriptionRef.current = currentNoteDescription;
+      noteIdRef.current = note.id;
+      isInitialMountRef.current = false;
+      return;
+    }
+    
+    // On initial mount or remount, always sync with note prop
+    // (any unsaved changes would have been saved on previous unmount)
+    if (isInitialMountRef.current) {
+      setContent({ description: currentNoteDescription });
+      lastSyncedNoteDescriptionRef.current = currentNoteDescription;
+      isInitialMountRef.current = false;
+      return;
+    }
+    
+    // If note description changed externally, check if we should sync
+    if (currentNoteDescription !== lastSynced) {
+      // Only sync if our local content matches what we last synced
+      // This means the note was updated externally (e.g., after a save completed)
+      // and we haven't made any new local changes since
+      if (localDescription === lastSynced) {
+        setContent({ description: currentNoteDescription });
+        lastSyncedNoteDescriptionRef.current = currentNoteDescription;
+      }
+    }
+  }, [note.id, note.description]);
+
   const saveChanges = React.useCallback(() => {
     const currentContent = contentRef.current;
+    const descriptionToSave = currentContent.description;
     onSave({
       ...note,
-      description: currentContent.description,
+      description: descriptionToSave,
     });
+    // Update the ref to track what we've saved
+    lastSyncedNoteDescriptionRef.current = descriptionToSave;
   }, [note, onSave]);
 
   const debouncedSave = React.useCallback(() => {
@@ -73,14 +116,23 @@ export const useNoteEditor = ({
     handleContentChange({ description: e.target.value });
   };
 
-  // Cleanup timeout on unmount
+  // Cleanup timeout on unmount and save immediately if there are pending changes
   React.useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
       }
+      // Save immediately on unmount if there are unsaved changes
+      const currentContent = contentRef.current;
+      const lastSynced = lastSyncedNoteDescriptionRef.current;
+      if (currentContent.description !== lastSynced) {
+        // Flush any pending saves immediately
+        saveChanges();
+      }
+      // Reset mount flag so next mount is treated as initial
+      isInitialMountRef.current = true;
     };
-  }, []);
+  }, [saveChanges]);
 
   // Auto-resize textarea
   React.useEffect(() => {
