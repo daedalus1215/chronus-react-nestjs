@@ -186,6 +186,13 @@ export const useNoteEditor = ({
     }
   }, [content.description]);
 
+  const handleContentChangeRef = React.useRef(handleContentChange);
+  
+  // Keep ref in sync
+  React.useEffect(() => {
+    handleContentChangeRef.current = handleContentChange;
+  }, [handleContentChange]);
+
   const appendToDescription = React.useCallback(
     (text: string) => {
       console.log('appendToDescription called with:', text);
@@ -205,7 +212,7 @@ export const useNoteEditor = ({
         currentDescription,
         text,
         (newText) => {
-          handleContentChange({ description: newText });
+          handleContentChangeRef.current({ description: newText });
         }
       );
 
@@ -213,12 +220,12 @@ export const useNoteEditor = ({
       if (!inserted) {
         console.warn('Textarea not found, falling back to append behavior');
         const newDescription = appendTextToEnd(currentDescription, text);
-        handleContentChange({
+        handleContentChangeRef.current({
           description: newDescription,
         });
       }
     },
-    [handleContentChange]
+    [] // No dependencies - use ref instead
   );
 
   return {
