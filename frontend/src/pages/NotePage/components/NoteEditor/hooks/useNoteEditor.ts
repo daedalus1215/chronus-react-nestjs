@@ -41,6 +41,7 @@ export const useNoteEditor = ({
   const lastSyncedNoteDescriptionRef = React.useRef<string>(note.description || '');
   const noteIdRef = React.useRef<number>(note.id);
   const isInitialMountRef = React.useRef<boolean>(true);
+  const isSyncingRef = React.useRef<boolean>(false);
 
   // Update contentRef when content changes
   React.useEffect(() => {
@@ -56,19 +57,28 @@ export const useNoteEditor = ({
     
     // If note ID changed, we're editing a different note - reset everything
     if (note.id !== previousNoteId) {
+      isSyncingRef.current = true;
       setContent({ description: currentNoteDescription });
       lastSyncedNoteDescriptionRef.current = currentNoteDescription;
       noteIdRef.current = note.id;
       isInitialMountRef.current = false;
+      isSyncingRef.current = false;
       return;
     }
     
     // On initial mount or remount, always sync with note prop
     // (any unsaved changes would have been saved on previous unmount)
     if (isInitialMountRef.current) {
+      isSyncingRef.current = true;
       setContent({ description: currentNoteDescription });
       lastSyncedNoteDescriptionRef.current = currentNoteDescription;
       isInitialMountRef.current = false;
+      isSyncingRef.current = false;
+      return;
+    }
+    
+    // Early return if already synced to prevent unnecessary work
+    if (currentNoteDescription === lastSynced && localDescription === lastSynced) {
       return;
     }
     
@@ -80,7 +90,12 @@ export const useNoteEditor = ({
       if (localDescription === lastSynced) {
         // Don't sync to empty if we have local content (prevents data loss from bad responses)
         if (currentNoteDescription || !localDescription) {
-          setContent({ description: currentNoteDescription });
+          // Only update if the value actually changed to prevent unnecessary re-renders
+          if (currentNoteDescription !== localDescription) {
+            isSyncingRef.current = true;
+            setContent({ description: currentNoteDescription });
+            isSyncingRef.current = false;
+          }
           lastSyncedNoteDescriptionRef.current = currentNoteDescription;
         }
       } else {
@@ -96,16 +111,25 @@ export const useNoteEditor = ({
     }
   }, [note.id, note.description]);
 
+  const noteRef = React.useRef(note);
+  const onSaveRef = React.useRef(onSave);
+
+  // Keep refs in sync
+  React.useEffect(() => {
+    noteRef.current = note;
+    onSaveRef.current = onSave;
+  }, [note, onSave]);
+
   const saveChanges = React.useCallback(() => {
     const currentContent = contentRef.current;
     const descriptionToSave = currentContent.description;
-    onSave({
-      ...note,
+    onSaveRef.current({
+      ...noteRef.current,
       description: descriptionToSave,
     });
     // Don't update lastSyncedRef here - wait for the prop to update after save completes
     // This prevents syncing to stale/empty values if the response is delayed or incorrect
-  }, [note, onSave]);
+  }, []); // No dependencies - use refs instead
 
   const debouncedSave = React.useCallback(() => {
     if (timeoutRef.current) {
@@ -116,6 +140,11 @@ export const useNoteEditor = ({
 
   const handleContentChange = React.useCallback(
     (updates: Partial<NoteContent>) => {
+      // Don't trigger save if we're currently syncing (prevents infinite loops)
+      if (isSyncingRef.current) {
+        setContent(prev => ({ ...prev, ...updates }));
+        return;
+      }
       setContent(prev => ({ ...prev, ...updates }));
       debouncedSave();
     },
