@@ -28,11 +28,36 @@ export const MobileNoteEditor: React.FC<NoteEditorProps> = ({
       onSave,
     });
 
+  // Track the last function we passed to prevent infinite loops
+  const lastAppendToDescriptionRef = React.useRef<((text: string) => void) | null>(null);
+  const onAppendToDescriptionRef = React.useRef(onAppendToDescription);
+
+  // Keep ref in sync
   React.useEffect(() => {
-    if (onAppendToDescription) {
-      onAppendToDescription(appendToDescription);
+    onAppendToDescriptionRef.current = onAppendToDescription;
+  }, [onAppendToDescription]);
+
+  // Set the callback only when it actually changes
+  React.useEffect(() => {
+    if (!onAppendToDescriptionRef.current || !appendToDescription) {
+      return;
     }
-  }, [appendToDescription, onAppendToDescription]);
+
+    // Only update if the function reference actually changed
+    if (lastAppendToDescriptionRef.current === appendToDescription) {
+      return;
+    }
+
+    lastAppendToDescriptionRef.current = appendToDescription;
+    
+    // Use requestAnimationFrame to defer the state update and avoid React error #185
+    // This ensures we're not updating state during render
+    requestAnimationFrame(() => {
+      if (onAppendToDescriptionRef.current) {
+        onAppendToDescriptionRef.current(appendToDescription);
+      }
+    });
+  }, [appendToDescription]);
 
   return (
     <div className={styles.editor}>
