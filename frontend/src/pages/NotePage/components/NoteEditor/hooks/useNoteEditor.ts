@@ -78,8 +78,20 @@ export const useNoteEditor = ({
       // This means the note was updated externally (e.g., after a save completed)
       // and we haven't made any new local changes since
       if (localDescription === lastSynced) {
-        setContent({ description: currentNoteDescription });
-        lastSyncedNoteDescriptionRef.current = currentNoteDescription;
+        // Don't sync to empty if we have local content (prevents data loss from bad responses)
+        if (currentNoteDescription || !localDescription) {
+          setContent({ description: currentNoteDescription });
+          lastSyncedNoteDescriptionRef.current = currentNoteDescription;
+        }
+      } else {
+        // If we have local changes that differ from what we last synced,
+        // but the prop updated, it means our save completed.
+        // Update lastSynced to the prop value to prevent future conflicts,
+        // but don't overwrite local changes.
+        // Only update if the prop value matches our local value (save succeeded)
+        if (currentNoteDescription === localDescription) {
+          lastSyncedNoteDescriptionRef.current = currentNoteDescription;
+        }
       }
     }
   }, [note.id, note.description]);
@@ -91,8 +103,8 @@ export const useNoteEditor = ({
       ...note,
       description: descriptionToSave,
     });
-    // Update the ref to track what we've saved
-    lastSyncedNoteDescriptionRef.current = descriptionToSave;
+    // Don't update lastSyncedRef here - wait for the prop to update after save completes
+    // This prevents syncing to stale/empty values if the response is delayed or incorrect
   }, [note, onSave]);
 
   const debouncedSave = React.useCallback(() => {
