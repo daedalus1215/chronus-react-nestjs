@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TextToSpeechAction } from './apps/actions/text-to-speech/text-to-speech.action';
 import { DownloadAudioAction } from './apps/actions/download-audio/download-audio.action';
@@ -29,6 +30,7 @@ import { TranscribeAudioGateway } from './apps/gateways/transcribe-audio.gateway
   imports: [
     HttpModule,
     ConfigModule,
+    JwtModule,
     NotesModule,
     TypeOrmModule.forFeature([NoteAudio]),
   ],
