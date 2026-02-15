@@ -16,6 +16,20 @@ type UseTranscriptionWebSocketReturn = {
   sendAudioChunk: (chunk: ArrayBuffer) => void;
 };
 
+// Type for proxied messages from chronus-backend
+interface ProxiedMessage {
+  type: 'transcription' | 'error';
+  data?: string;
+  code?: string;
+  message?: string;
+  timestamp?: string;
+}
+
+// Type for legacy messages from thoth-backend
+interface LegacyMessage {
+  transcription?: string;
+}
+
 export const useTranscriptionWebSocket = ({
   noteId, // Not needed for direct thoth connection
   onTranscription,
@@ -30,6 +44,9 @@ export const useTranscriptionWebSocket = ({
   const wsRef = useRef<WebSocket | null>(null);
   const isRecordingRef = useRef<boolean>(false); // Use ref for immediate state access in callbacks
   const onTranscriptionRef = useRef(onTranscription); // Store latest callback in ref
+
+  // Check if we're using the proxied connection
+  const useProxy = env.VITE_USE_TRANSCRIPTION_PROXY === 'true';
 
   // Keep ref updated with latest callback - ALWAYS update it, even if it looks the same
   useEffect(() => {
@@ -84,6 +101,104 @@ export const useTranscriptionWebSocket = ({
     }
   }, [onTranscription]);
 
+  const getWebSocketUrl = useCallback((): string => {
+    if (useProxy) {
+      // Connect to chronus-backend proxy
+      const apiUrl = env.VITE_API_URL.replace(/^http/, 'ws'); // http -> ws, https -> wss
+      const token = localStorage.getItem('jwt_token');
+      if (!token) {
+        throw new Error('No JWT token found. Please log in again.');
+      }
+      const wsUrl = `${apiUrl}/api/audio/transcribe?token=${encodeURIComponent(token)}`;
+      console.log('Connecting to chronus-backend proxy:', wsUrl);
+      return wsUrl;
+    } else {
+      // Legacy: Connect directly to thoth-backend
+      const thothWsUrl = env.VITE_THOTH_WS_URL;
+      const wsUrl = `${thothWsUrl}/stream-audio`;
+      console.log('Connecting directly to Thoth WebSocket:', wsUrl);
+      return wsUrl;
+    }
+  }, [useProxy]);
+
+  const handleProxiedMessage = useCallback((data: ProxiedMessage): void => {
+    if (data.type === 'transcription' && data.data) {
+      const trimmed = data.data.trim();
+      if (trimmed && trimmed !== 'undefined') {
+        console.log(`📨 Received transcription from proxy: "${trimmed}"`);
+        
+        const callback = onTranscriptionRef.current;
+        if (!callback || typeof callback !== 'function') {
+          console.error('❌ onTranscription callback is not available');
+          return;
+        }
+
+        try {
+          callback(trimmed);
+          console.log('✅ onTranscription callback executed via proxy');
+        } catch (err) {
+          console.error('❌ Error executing onTranscription callback:', err);
+        }
+      }
+    } else if (data.type === 'error') {
+      const errorMessage = data.message || 'Unknown error from transcription service';
+      console.error('❌ Error from transcription proxy:', errorMessage);
+      setError(errorMessage);
+    }
+  }, []);
+
+  const handleLegacyMessage = useCallback((data: LegacyMessage): void => {
+    if (
+      data &&
+      data.transcription !== undefined &&
+      data.transcription !== null &&
+      typeof data.transcription === 'string' &&
+      data.transcription.trim() !== '' &&
+      data.transcription !== 'undefined'
+    ) {
+      const trimmed = data.transcription.trim();
+      console.log(`📨 Received transcription from Thoth: "${trimmed}"`);
+
+      const callback = onTranscriptionRef.current;
+
+      if (!callback) {
+        console.error('❌ onTranscription callback is null or undefined!');
+        return;
+      }
+
+      if (typeof callback !== 'function') {
+        console.error(
+          '❌ onTranscription callback is not a function:',
+          typeof callback
+        );
+        return;
+      }
+
+      const callbackStr = callback.toString();
+      const isWrapperCallback =
+        callbackStr.includes('onTranscriptionCallback') ||
+        callbackStr.includes('appendToDescriptionFn');
+
+      console.log('🔍 Callback analysis:', {
+        isFunction: typeof callback === 'function',
+        isWrapperCallback,
+        callbackPreview: callbackStr.substring(0, 300),
+      });
+
+      console.log('▶️ Calling onTranscription callback with:', trimmed);
+      try {
+        callback(trimmed);
+        console.log(
+          '✅ onTranscription callback executed - check if appendToDescription was called'
+        );
+      } catch (err) {
+        console.error('❌ Error executing onTranscription callback:', err);
+      }
+    } else {
+      console.debug('Skipping invalid transcription:', data);
+    }
+  }, []);
+
   const connect = useCallback((): Promise<void> => {
     // If WebSocket exists and is open, don't create a new one
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -100,11 +215,7 @@ export const useTranscriptionWebSocket = ({
       wsRef.current = null;
     }
 
-    // Connect directly to thoth-backend, just like thoth-frontend does
-    const thothWsUrl = env.VITE_THOTH_WS_URL;
-    const wsUrl = `${thothWsUrl}/stream-audio`;
-
-    console.log('Connecting directly to Thoth WebSocket:', wsUrl);
+    const wsUrl = getWebSocketUrl();
 
     return new Promise((resolve, reject) => {
       const ws = new WebSocket(wsUrl);
@@ -112,7 +223,7 @@ export const useTranscriptionWebSocket = ({
 
       ws.onopen = () => {
         opened = true;
-        console.log('WebSocket connected successfully to Thoth!');
+        console.log(`WebSocket connected successfully to ${useProxy ? 'chronus-backend proxy' : 'Thoth'}!`);
         setIsConnected(true);
         setError(null);
         resolve();
@@ -121,56 +232,12 @@ export const useTranscriptionWebSocket = ({
       ws.onmessage = event => {
         try {
           const data = JSON.parse(event.data);
-          console.log('Received message from Thoth:', data);
+          console.log(`Received message from ${useProxy ? 'proxy' : 'Thost'}:`, data);
 
-          if (
-            data &&
-            data.transcription !== undefined &&
-            data.transcription !== null &&
-            typeof data.transcription === 'string' &&
-            data.transcription.trim() !== '' &&
-            data.transcription !== 'undefined'
-          ) {
-            const trimmed = data.transcription.trim();
-            console.log(`📨 Received transcription: "${trimmed}"`);
-
-            const callback = onTranscriptionRef.current;
-
-            if (!callback) {
-              console.error('❌ onTranscription callback is null or undefined!');
-              return;
-            }
-
-            if (typeof callback !== 'function') {
-              console.error(
-                '❌ onTranscription callback is not a function:',
-                typeof callback
-              );
-              return;
-            }
-
-            const callbackStr = callback.toString();
-            const isWrapperCallback =
-              callbackStr.includes('onTranscriptionCallback') ||
-              callbackStr.includes('appendToDescriptionFn');
-
-            console.log('🔍 Callback analysis:', {
-              isFunction: typeof callback === 'function',
-              isWrapperCallback,
-              callbackPreview: callbackStr.substring(0, 300),
-            });
-
-            console.log('▶️ Calling onTranscription callback with:', trimmed);
-            try {
-              callback(trimmed);
-              console.log(
-                '✅ onTranscription callback executed - check if appendToDescription was called'
-              );
-            } catch (err) {
-              console.error('❌ Error executing onTranscription callback:', err);
-            }
+          if (useProxy) {
+            handleProxiedMessage(data as ProxiedMessage);
           } else {
-            console.debug('Skipping invalid transcription:', data);
+            handleLegacyMessage(data as LegacyMessage);
           }
         } catch (err) {
           console.error('Error parsing transcription message:', err);
@@ -205,7 +272,7 @@ export const useTranscriptionWebSocket = ({
 
       wsRef.current = ws;
     });
-  }, []);
+  }, [getWebSocketUrl, useProxy, handleProxiedMessage, handleLegacyMessage]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
@@ -250,7 +317,7 @@ export const useTranscriptionWebSocket = ({
         // Log occasionally to avoid spam
         if (Math.random() < 0.01) {
           console.log(
-            `Sending audio chunk to Thoth, size: ${chunk.byteLength} bytes`
+            `Sending audio chunk to ${useProxy ? 'proxy' : 'Thoth'}, size: ${chunk.byteLength} bytes`
           );
         }
         wsRef.current.send(chunk);
@@ -268,7 +335,7 @@ export const useTranscriptionWebSocket = ({
         });
       }
     }
-  }, []);
+  }, [useProxy]);
 
   // Cleanup on unmount
   useEffect(() => {

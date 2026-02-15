@@ -16,12 +16,14 @@ import { GetNoteAudioByIdTransactionScript } from './domain/transaction-scripts/
 import { DeleteNoteAudiosTransactionScript } from './domain/transaction-scripts/delete-note-audios-TS/delete-note-audios.transaction.script';
 import { StreamAudioTransactionScript } from './domain/transaction-scripts/stream-audio-ts/stream-audio.transaction.script';
 import { HermesRemoteCaller } from './infrastructure/remote-callers/hermes.remote-caller';
+import { ThothWebSocketClientService } from './infrastructure/remote-callers/thoth-websocket-client.service';
 import { AudioFileCache } from './infrastructure/cache/audio-file.cache';
 import { NoteAudioRepository } from './infrastructure/repositories/note-audio.repository';
 import { NoteAudio } from './domain/entities/note-audio.entity';
 import { NotesModule } from 'src/notes/notes.module';
 import { NOTE_OWNERSHIP_PORT } from './domain/ports/note-ownership.port';
 import { DownloadAudioResponder } from './apps/actions/download-audio/download-audio.responder';
+import { TranscribeAudioGateway } from './apps/gateways/transcribe-audio.gateway';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { DownloadAudioResponder } from './apps/actions/download-audio/download-a
     DeleteNoteAudiosTransactionScript,
     StreamAudioTransactionScript,
     HermesRemoteCaller,
+    ThothWebSocketClientService,
+    TranscribeAudioGateway,
     NoteAudioRepository,
     DownloadAudioResponder,
   ],

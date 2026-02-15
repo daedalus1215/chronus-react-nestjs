@@ -3,6 +3,7 @@ export const env = {
     VITE_PORT: '5173',
     VITE_HOST: '0.0.0.0',
     VITE_THOTH_WS_URL: 'wss://localhost:8443',
+    VITE_USE_TRANSCRIPTION_PROXY: 'false',
     VITE_BASE_URL: '/',
     VITE_ALLOWED_HOSTS: 'localhost'
 }
