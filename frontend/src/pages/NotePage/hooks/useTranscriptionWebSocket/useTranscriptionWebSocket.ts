@@ -104,7 +104,7 @@ export const useTranscriptionWebSocket = ({
   const getWebSocketUrl = useCallback((): string => {
     if (useProxy) {
       // Connect to chronus-backend proxy
-      const apiUrl = env.VITE_API_URL.replace(/^http/, 'ws'); // http -> ws, https -> wss
+      const apiUrl = `wss://${env.VITE_ALLOWED_HOSTS}`; // http -> ws, https -> wss
       const token = localStorage.getItem('jwt_token');
       if (!token) {
         throw new Error('No JWT token found. Please log in again.');
